@@ -115,9 +115,13 @@ class LinkerHand(Node):
         elif self.hand_joint == "L25":
             pose = [75, 255, 255, 255, 255, 176, 97, 81, 114, 147, 202, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
         if pose is not None:
-            self.api.set_speed(speed=speed)
-            self.api.set_torque(torque=torque)
-            self.api.finger_move(pose=pose)
+            for i in range(3): # 循环设置3次，防止数据丢失
+                self.api.set_speed(speed=speed)
+                time.sleep(0.1)
+                self.api.set_torque(torque=torque)
+                time.sleep(0.1)
+                self.api.finger_move(pose=pose)
+                time.sleep(0.1)
 
 
     def run(self):

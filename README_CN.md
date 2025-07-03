@@ -89,8 +89,9 @@ $ ros2 topic echo /cb_left_hand_control_cmd
 
 ## 版本更新
 - > ### release_2.1.7
-  - 1、支持WIN+ROS2环境
-  
+ - 1、修复已知问题
+ - 2、将[Mujoco和PyBullet仿真](https://github.com/linkerbotai/linker_hand_sim)移到仿真仓库中，减少SDK体量
+
 - > ### release_2.1.6
   - 1、支持双CAN控制双灵巧手
   - 2、新增Mujoco仿真
@@ -139,34 +140,6 @@ $ call ./install/setup.bash
 $ ros2 launch gui_control gui_control.launch.py
 ```
 
-
-## 使用 Mujoco 模拟 L7\L10\L20\L21 仿真环境
-&ensp;&ensp; __使用前请先将 [linker_hand_mujoco.launch.py](linker_hand_ros2_sdk/src/examples/linker_hand_mujoco/launch/)文件按照实际灵巧手参数进行配置.__
-- [linker_hand_mujoco](linker_hand_ros2_sdk/src/examples/linker_hand_mujoco/) # 支持topic or GUI控制仿真Linker Hand L7、L10、L20、L21
-
-启动mujoco仿真
-```bash
-$ cd linker_hand_sdk
-$ pip install -r requirements.txt
-$ source ./install/setup.bash
-$ ros2 launch linker_hand_mujoco linker_hand_mujoco.launch.py
-```
-mujoco仿真启动成功后可启动GUI控制界面控制仿真灵巧手
-
-## 使用 PyBullet 模拟 L7\L10\L20\L21 仿真环境
-&ensp;&ensp; __使用前请先将 [linker_hand_pybullet.launch.py](linker_hand_ros2_sdk/src/examples/linker_hand_pybullet/launch/)文件按照实际灵巧手参数进行配置.__
-- [linker_hand_pybullet](linker_hand_ros2_sdk/src/examples/linker_hand_pybullet/) # 支持topic or GUI控制仿真Linker Hand L7、L10、L20、L21
-
-启动Pybullet仿真
-```bash
-$ cd linker_hand_sdk
-$ pip install -r requirements.txt
-$ source ./install/setup.bash
-$ ros2 launch  linker_hand_pybullet linker_hand_pybullet.launch.py
-```
-Pybullet仿真启动成功后可启动GUI控制界面控制仿真灵巧手
-
-
 ## L7
 - [7001-action-group-show-ti(手指运动)](手指运动)
 
@@ -176,6 +149,9 @@ Pybullet仿真启动成功后可启动GUI控制界面控制仿真灵巧手
 
 ## Topic Document
 [Linker Hand Topic Document](doc/Topic-Reference.md)
+
+## Mujoco Pybullet仿真
+ - [Mujoco和PyBullet仓库](https://github.com/linkerbotai/linker_hand_sim)
 
 
 

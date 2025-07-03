@@ -13,7 +13,7 @@ def generate_launch_description():
             output='screen',
             parameters=[{
                 'hand_type': 'left',
-                'hand_joint': "L10",
+                'hand_joint': "L20",
                 'topic_hz': 30,
                 'is_touch': True,
             }],

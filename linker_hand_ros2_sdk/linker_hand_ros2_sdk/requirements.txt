@@ -17,4 +17,4 @@ pyqtgraph
 dm_control
 uvicorn
 matplotlib
-mujoco
+sapien
