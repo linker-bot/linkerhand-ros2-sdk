@@ -38,7 +38,8 @@ class LinkerHandL20Can:
         self.open_can = OpenCan(load_yaml=yaml)
 
         self.running = True
-        self.x05, self.x06, self.x07 = [],[],[]
+        self.x05 = [255] * 5
+        self.x06, self.x07 = [],[]
         # New pressure sensors
         self.xb0,self.xb1,self.xb2,self.xb3,self.xb4,self.xb5 = [-1] * 5,[-1] * 5,[-1] * 5,[-1] * 5,[-1] * 5,[-1] * 5
         
@@ -80,9 +81,9 @@ class LinkerHandL20Can:
             print("Please insert CAN device")
 
         # Initialize data storage
-        self.x01, self.x02, self.x03, self.x04 = [[0.0] * 5 for _ in range(4)]
+        self.x01, self.x02, self.x03, self.x04 = [[-1] * 5 for _ in range(4)]
         self.normal_force, self.tangential_force, self.tangential_force_dir, self.approach_inc = \
-            [[0.0] * 5 for _ in range(4)]
+            [[-1] * 5 for _ in range(4)]
 
         # Start receive thread
         self.receive_thread = threading.Thread(target=self.receive_response)
