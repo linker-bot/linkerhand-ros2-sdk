@@ -5,7 +5,9 @@ import time,sys
 import threading
 import numpy as np
 from enum import Enum
-from LinkerHand.utils.open_can import OpenCan
+from utils.open_can import OpenCan
+
+
 
 class FrameProperty(Enum):
     INVALID_FRAME_PROPERTY = 0x00
@@ -282,8 +284,9 @@ class LinkerHandL10Can:
         return state
     def get_speed(self):
         '''Get current speed'''
-        # self.send_frame(0x05,[],sleep=0.005)
-        # self.send_frame(0x06,[],sleep=0.005)
+        self.send_frame(0x05,[],sleep=0.003)
+        self.send_frame(0x06,[],sleep=0.003)
+        print(self.x05 + self.x06, flush=True)
         return self.x05 + self.x06
         
     def get_force(self):
