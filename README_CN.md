@@ -17,6 +17,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 - 编译
 
 ```bash
+  $ sudo apt install python3-can
   $ cd linker_hand_ros2_sdk/src/
   $ pip install -r requirements.txt
 ```
