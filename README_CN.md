@@ -26,7 +26,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 - 修改setting.yaml配置文件的密码，默认PASSWORD："12345678" 
 默认密码为Ubuntu系统的密码，用户sdk自动开启CAN端口
 
-&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](linker_hand_ros2_sdk/src/linker_hand_ros2_sdk/launch/)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)文件按照实际灵巧手参数进行配置.__
 
 - 启动SDK&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:L7/L10/L20/L21/L25
 ```bash
