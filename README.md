@@ -24,6 +24,7 @@ Download
 
 ```bash
   $ cd linker_hand_ros2_sdk/src/
+  $ sudo apt install python3-can
   $ pip install -r requirements.txt
 ```
 
