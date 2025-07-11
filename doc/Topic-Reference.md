@@ -175,3 +175,68 @@ l21_r_min = [0, 0, 0, 0, 0, 0, -0.18, -0.18, -0.18, -0.18, -0.6, 0, 0, 0, 0, 0, 
 l21_r_max = [1, 1.57, 1.57, 1.57, 1.57, 1.6, 0.18, 0.18, 0.18, 0.18, 0.6, 0, 0, 0, 0, 1.57, 0, 0, 0, 0, 1.57, 1.57, 1.57, 1.57, 1.57]
 l21_r_derict = [-1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, 0, 0, 0, 0, -1, -1, -1, -1, -1]
 #---------------------------------------------------------------------------------------------------
+
+
+
+# Topic 示例
+# L7
+- L7右手握拳
+```bash
+ros2 topic pub /cb_right_hand_control_cmd sensor_msgs/msg/JointState "
+header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: ''
+name: []
+position: [75,115,0,0,0,0,42]
+velocity: [255,255,255,255,255,255,255]
+effort: []
+"
+```
+
+- L7右手张开
+```bash
+ros2 topic pub /cb_right_hand_control_cmd sensor_msgs/msg/JointState "
+header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: ''
+name: []
+position: [255,255,255,255,255,255,34]
+velocity: [255,255,255,255,255,255,255]
+effort: [0.0, 0.0]
+"
+```
+
+# L10
+- L10右手握拳
+```bash
+ros2 topic pub /cb_right_hand_control_cmd sensor_msgs/msg/JointState "
+header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: ''
+name: []
+position: [73,75,0,0,0,0,110,110,120,78]
+velocity: [255,255,255,255,255,255,255,255,255,255]
+effort: []
+"
+```
+
+- L10右手张开
+```bash
+ros2 topic pub /cb_right_hand_control_cmd sensor_msgs/msg/JointState "
+header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: ''
+name: []
+position: [255,210,255,255,255,255,110,110,120,33]
+velocity: [255,255,255,255,255,255,255,255,255,255]
+effort: [0.0, 0.0]
+"
+```

@@ -207,7 +207,7 @@ class LinkerHand(Node):
                 }
                 #self.last_hand_info = data
                 self.pub_hand_info(dic=data)
-            time.sleep(0.1)
+            time.sleep(0.3)
 
     def pub_hand_info(self,dic):
         msg = String()

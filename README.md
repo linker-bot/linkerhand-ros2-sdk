@@ -91,7 +91,10 @@ $ ros2 topic echo /cb_left_hand_control_cmd
 
   L25: ["Thumb base", "Index base", "Middle base", "Ring base", "Little base", "Thumb abduction", "Index abduction", "Middle abduction", "Ring abduction", "Little abduction", "Thumb roll", "Reserved", "Reserved", "Reserved", "Reserved", "Thumb middle", "Index middle", "Middle middle", "Ring middle", "Little middle", "Thumb tip", "Index tip", "Middle tip", "Ring tip", "Little tip"]  
 
-## Version Updates  
+## Version Updates
+- > ### release_2.1.8
+ - 1. Fix occasional frame collision issues
+
 - > ### release_2.1.7  
  - 1. Fixed known issues.  
  - 2. Moved [Mujoco and PyBullet simulation](https://github.com/linkerbotai/linker_hand_sim) to a separate repository to reduce SDK size.  
