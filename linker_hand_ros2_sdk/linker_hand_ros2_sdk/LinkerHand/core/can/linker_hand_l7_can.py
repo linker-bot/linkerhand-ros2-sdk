@@ -226,7 +226,7 @@ class LinkerHandL7Can:
         return self.x01
 
     def get_speed(self):
-        self.send_frame(0x05, [],sleep=0.002)
+        self.send_frame(0x05, [],sleep=0.003)
         return self.x05
 
     def get_current(self):
