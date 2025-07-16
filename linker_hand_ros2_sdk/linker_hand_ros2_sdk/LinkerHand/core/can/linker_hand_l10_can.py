@@ -76,6 +76,7 @@ class LinkerHandL10Can:
         self.receive_thread = threading.Thread(target=self.receive_response)
         self.receive_thread.daemon = True
         self.receive_thread.start()
+        self.version = self.get_version()
 
     def init_can_bus(self, channel, baudrate):
         try:
@@ -277,9 +278,9 @@ class LinkerHandL10Can:
         return self.version
     def get_current_status(self):
         '''Get current joint status'''
-        if self.version[4] > 35:
-            self.send_frame(0x01,[],sleep=0.002)
-            self.send_frame(0x04,[],sleep=0.002)
+        #if self.version != None and self.version[4] > 35:
+        self.send_frame(0x01,[],sleep=0.003)
+        self.send_frame(0x04,[],sleep=0.003)
         state = self.x01 + self.x04
         return state
     def get_speed(self):
@@ -324,16 +325,16 @@ class LinkerHandL10Can:
         return [self.xb1[1],self.xb2[1],self.xb3[1],self.xb4[1],self.xb5[1],0] # The last digit is palm, currently not available
 
     def get_matrix_touch(self):
-        self.send_frame(0xb1,[0xc6],sleep=0.04)
-        self.send_frame(0xb2,[0xc6],sleep=0.04)
-        self.send_frame(0xb3,[0xc6],sleep=0.04)
-        self.send_frame(0xb4,[0xc6],sleep=0.04)
-        self.send_frame(0xb5,[0xc6],sleep=0.04)
+        self.send_frame(0xb1,[0xc6],sleep=0.01)
+        self.send_frame(0xb2,[0xc6],sleep=0.01)
+        self.send_frame(0xb3,[0xc6],sleep=0.01)
+        self.send_frame(0xb4,[0xc6],sleep=0.01)
+        self.send_frame(0xb5,[0xc6],sleep=0.01)
         return self.thumb_matrix , self.index_matrix , self.middle_matrix , self.ring_matrix , self.little_matrix
 
     def get_torque(self):
         '''Get current motor torque'''
-        if self.version[4]< 36:
+        if self.version != None and self.version[4]< 36:
             return [-1] * 5
         else:
             self.send_frame(0x02, [])

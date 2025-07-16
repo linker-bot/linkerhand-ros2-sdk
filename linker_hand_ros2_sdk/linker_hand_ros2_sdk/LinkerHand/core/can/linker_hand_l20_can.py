@@ -4,7 +4,7 @@ import can
 import threading
 from enum import Enum
 import numpy as np
-from LinkerHand.utils.open_can import OpenCan
+from utils.open_can import OpenCan
 
 class FrameProperty(Enum):
     INVALID_FRAME_PROPERTY = 0x00  # Invalid CAN frame property | No return
@@ -78,7 +78,7 @@ class LinkerHandL20Can:
             else:
                 raise EnvironmentError("Unsupported platform for CAN interface")
         except:
-            print("Please insert CAN device")
+            print("Please insert CAN device",flush=True)
 
         # Initialize data storage
         self.x01, self.x02, self.x03, self.x04 = [[-1] * 5 for _ in range(4)]
@@ -86,6 +86,8 @@ class LinkerHandL20Can:
             [[-1] * 5 for _ in range(4)]
 
         # Start receive thread
+        self.get_touch_type()
+        time.sleep(0.1)
         self.receive_thread = threading.Thread(target=self.receive_response)
         self.receive_thread.daemon = True
         self.receive_thread.start()
@@ -116,27 +118,20 @@ class LinkerHandL20Can:
                 if msg:
                     self.process_response(msg)
             except can.CanError as e:
-                print(f"Error receiving message: {e}")
-                self.open_can.open_can(self.can_channel)
-                time.sleep(1)
-                self.is_can = self.open_can.is_can_up_sysfs(interface=self.can_channel)
-                time.sleep(1)
-                if self.is_can:
-                    self.bus = can.interface.Bus(channel=self.can_channel, interface="socketcan", bitrate=self.baudrate)
-                else:
-                    print("Reconnecting CAN devices ....")
+                print(f"Error receiving message666: {e}",flush=True)
+                
 
     def set_finger_base(self, angles):
-        self.send_command(FrameProperty.JOINT_PITCH_R, angles)
+        self.send_command(FrameProperty.JOINT_PITCH_NR, angles)
 
     def set_finger_tip(self, angles):
-        self.send_command(FrameProperty.JOINT_TIP_R, angles)
+        self.send_command(FrameProperty.JOINT_TIP_NR, angles)
 
     def set_finger_middle(self, angles):
-        self.send_command(FrameProperty.JOINT_YAW_R, angles)
+        self.send_command(FrameProperty.JOINT_YAW_NR, angles)
 
     def set_thumb_roll(self, angle):
-        self.send_command(FrameProperty.JOINT_ROLL_R, angle)
+        self.send_command(FrameProperty.JOINT_ROLL_NR, angle)
 
     def send_command(self, frame_property, data_list,sleep=0.002):
         frame_property_value = int(frame_property.value) if hasattr(frame_property, 'value') else frame_property
@@ -147,6 +142,14 @@ class LinkerHandL20Can:
             self.bus.send(msg)
         except can.CanError:
             print("Message NOT sent")
+            self.open_can.open_can(self.can_channel)
+            time.sleep(1)
+            self.is_can = self.open_can.is_can_up_sysfs(interface=self.can_channel)
+            time.sleep(1)
+            if self.is_can:
+                self.bus = can.interface.Bus(channel=self.can_channel, interface="socketcan", bitrate=self.baudrate)
+            else:
+                print("Reconnecting CAN devices ....",flush=True)
         time.sleep(sleep)
 
     def set_joint_pitch(self, frame, angles):
@@ -300,10 +303,10 @@ class LinkerHandL20Can:
         return [0] * 5
     def get_current_status(self):
         '''Get current finger joint status'''
-        self.send_command(0x01,[])
-        self.send_command(0x02,[])
-        self.send_command(0x03,[])
-        self.send_command(0x04,[])
+        self.send_command(0x01,[],sleep=0.01)
+        self.send_command(0x02,[],sleep=0.01)
+        self.send_command(0x03,[],sleep=0.01)
+        self.send_command(0x04,[],sleep=0.01)
         return self.x01 + self.x02 + self.x03 + self.x04
     def get_speed(self):
         '''Get current motor speed'''
@@ -327,23 +330,21 @@ class LinkerHandL20Can:
     def clear_faults(self):
         '''Clear motor faults'''
         self.send_command(0x07, [1, 1, 1, 1, 1])
+
     def get_touch_type(self):
         '''Get touch type'''
-        self.send_command(0xb0,[],sleep=0.03)
-        self.send_command(0xb1,[],sleep=0.03)
         t = []
         for i in range(3):
-            t = self.xb1
-            time.sleep(0.01)
-        if len(t) == 2:
+            self.send_command(0xb0,[],sleep=0.03)
+        if self.xb0 == [2]:
             return 2
+        elif self.xb0 == [1]:
+            return 1
         else:
             self.send_command(0x20,[],sleep=0.03)
             time.sleep(0.01)
             if self.normal_force[0] == -1:
                 return -1
-            else:
-                return 1
     
     def get_touch(self):
         '''Get touch data'''

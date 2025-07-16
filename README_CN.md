@@ -17,16 +17,17 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 - 编译
 
 ```bash
+  $ sudo apt install python3-can
   $ cd linker_hand_ros2_sdk/src/
   $ pip install -r requirements.txt
 ```
 
 ## 使用 for Ubuntu
-&ensp;&ensp; __使用前请先将 [setting.yaml](linker_hand_ros2_sdk/src/linker_hand_ros2_sdk/linker_hand_ros2_sdk/LinkerHand/config) 配置文件根据实际需求进行相应修改该.__
+&ensp;&ensp; __使用前请先将 [setting.yaml](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/linker_hand_ros2_sdk/linker_hand_ros2_sdk/LinkerHand/config/setting.yaml) 配置文件根据实际需求进行相应修改该.__
 - 修改setting.yaml配置文件的密码，默认PASSWORD："12345678" 
 默认密码为Ubuntu系统的密码，用户sdk自动开启CAN端口
 
-&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](linker_hand_ros2_sdk/src/linker_hand_ros2_sdk/launch/)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)文件按照实际灵巧手参数进行配置.__
 
 - 启动SDK&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:L7/L10/L20/L21/L25
 ```bash
@@ -43,7 +44,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 
 ## 使用 for WIN+ROS2
 
-&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](linker_hand_ros2_sdk/src/linker_hand_ros2_sdk/launch/)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)文件按照实际灵巧手参数进行配置.__
 
 - 启动SDK&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入WIN系统设备上  支持型号:L7/L10/L20/L21/L25
 - 注：安装好USB转CAN驱动后才可使用
@@ -88,6 +89,10 @@ $ ros2 topic echo /cb_left_hand_control_cmd
   L25: ["大拇指根部", "食指根部", "中指根部","无名指根部","小拇指根部","大拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小拇指侧摆","大拇指横滚","预留","预留","预留","预留","大拇指中部","食指中部","中指中部","无名指中部","小拇指中部","大拇指指尖","食指指尖","中指指尖","无名指指尖","小拇指指尖"]
 
 ## 版本更新
+
+- > ### release_2.1.8
+ - 1、修复偶发撞帧问题
+
 - > ### release_2.1.7
  - 1、修复已知问题
  - 2、将[Mujoco和PyBullet仿真](https://github.com/linkerbotai/linker_hand_sim)移到仿真仓库中，减少SDK体量
@@ -111,7 +116,7 @@ $ ros2 topic echo /cb_left_hand_control_cmd
 
 ## [示例](examples/)
 
-&ensp;&ensp; __使用前请先将 [setting.yaml](linker_hand_ros2_sdk/src/linker_hand_ros2_sdk/linker_hand_ros2_sdk/LinkerHand/config) 配置文件根据实际需求进行相应修改该.__
+&ensp;&ensp; __使用前请先将 [setting.yaml](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/linker_hand_ros2_sdk/linker_hand_ros2_sdk/LinkerHand/config/setting.yaml) 配置文件根据实际需求进行相应修改该.__
 
 
 ## 通用
@@ -122,7 +127,7 @@ $ ros2 topic echo /cb_left_hand_control_cmd
 gui_control界面控制灵巧手需要启动linker_hand_sdk_ros，以topic的形式对LinkerHand灵巧手进行操作
 开启ROS2 SDK后
 
-&ensp;&ensp; __使用前请先将 [gui_control.launch.py](linker_hand_ros2_sdk/src/gui_control/launch/)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [gui_control.launch.py](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/gui_control/launch/gui_control.launch.py)文件按照实际灵巧手参数进行配置.__
 ```bash
 # 新开终端
 $ cd linker_hand_ros2_sdk/
@@ -132,7 +137,7 @@ $ ros2 launch gui_control gui_control.launch.py
 开启后会弹出UI界面。通过滑动条可控制相应LinkerHand灵巧手关节运动
 
 ## WIN+ROS2环境下使用GUI
-&ensp;&ensp; __使用前请先将 [gui_control.launch.py](linker_hand_ros2_sdk/src/gui_control/launch/)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [gui_control.launch.py](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/gui_control/launch/gui_control.launch.py)文件按照实际灵巧手参数进行配置.__
 ```bash
 # 新开终端
 $ cd linker_hand_ros2_sdk/
@@ -141,10 +146,10 @@ $ ros2 launch gui_control gui_control.launch.py
 ```
 
 ## L7
-- [7001-action-group-show-ti(手指运动)](手指运动)
+- [7001-action-group-show-ti(手指运动)](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/examples/L7/gesture/action-group-show-ti.py)
 
 ## L10
-- [10001-action-group-show-normal(手指运动)](手指运动)
+- [10001-action-group-show-normal(手指运动)](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/examples/L10/gesture/action-group-show-normal.py)
 
 
 ## Topic Document
