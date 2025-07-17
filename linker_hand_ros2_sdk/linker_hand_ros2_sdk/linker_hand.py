@@ -5,12 +5,15 @@
 启动命令:ros2 run linker_hand_ros2_sdk linker_hand_sdk
 '''
 import rclpy,math,sys                                     # ROS2 Python接口库
+import subprocess
+import time
+
 from rclpy.node import Node                      # ROS2 节点类
-import rclpy.time
+import numpy as np
 from std_msgs.msg import String, Header, Float32MultiArray
 from sensor_msgs.msg import JointState
 import time,threading, json
-
+from datetime import datetime
 from linker_hand_ros2_sdk.LinkerHand.linker_hand_api import LinkerHandApi
 from linker_hand_ros2_sdk.LinkerHand.utils.color_msg import ColorMsg
 from linker_hand_ros2_sdk.LinkerHand.utils.open_can import OpenCan
@@ -49,8 +52,15 @@ class LinkerHand(Node):
             "finger_order": [] # Finger motor order
         }
         self.last_hand_state = {
-            "state": [],
-            "vel": []
+            "state": [-1] * 5,
+            "vel": [-1] * 5
+        }
+        self.matrix_dic = {
+            "thumb_matrix":[[-1] * 12 for _ in range(6)],
+            "index_matrix":[[-1] * 12 for _ in range(6)],
+            "middle_matrix":[[-1] * 12 for _ in range(6)],
+            "ring_matrix":[[-1] * 12 for _ in range(6)],
+            "little_matrix":[[-1] * 12 for _ in range(6)]
         }
         self.last_hand_matrix_touch = String()
         self.last_hand_touch = String()
@@ -96,7 +106,7 @@ class LinkerHand(Node):
                     self.matrix_touch_pub = self.create_publisher(String, '/cb_right_hand_matrix_touch', 10)
                 elif self.touch_type != -1:
                     self.touch_pub = self.create_publisher(Float32MultiArray, '/cb_right_hand_force', 10)
-        self.version = self.api.get_version()
+        self.embedded_version = self.api.get_embedded_version()
         pose = None
         torque = [200, 200, 200, 200, 200]
         speed = [200, 250, 250, 250, 250]
@@ -115,7 +125,7 @@ class LinkerHand(Node):
         elif self.hand_joint == "L25":
             pose = [75, 255, 255, 255, 255, 176, 97, 81, 114, 147, 202, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
         if pose is not None:
-            for i in range(3): # 循环设置3次，防止数据丢失
+            for i in range(1): # 循环设置3次，防止数据丢失
                 self.api.set_speed(speed=speed)
                 time.sleep(0.1)
                 self.api.set_torque(torque=torque)
@@ -147,6 +157,35 @@ class LinkerHand(Node):
             # self.thread_get_touch.join()
 
 
+    def run_v2(self):
+        self.thread_get_all_state = threading.Thread(target=self.get_all_state_v2)
+        self.thread_get_all_state.daemon = True
+        self.thread_get_all_state.start()
+        self.thread_pub_all_state = threading.Thread(target=self.get_pub_state_v2)
+        self.thread_pub_all_state.daemon = True
+        self.thread_pub_all_state.start()
+
+    def get_all_state_v2(self):
+        count = 0
+        while True:
+            self._get_hand_state_v2()
+            if count % 3 == 0:
+                self.get_matrix_touch_v2()
+            if count % 5 == 0:
+                self.get_hand_info_v2()
+            if count == 10:
+                count = 0
+            count += 1
+            time.sleep(0.01)
+
+    def get_pub_state_v2(self):
+        m_t = String()
+        while True:
+            self.pub_hand_state(hand_state=self.last_hand_state)
+            self.pub_hand_info(dic=self.last_hand_info)
+            m_t.data = json.dumps(self.matrix_dic)
+            self.matrix_touch_pub.publish(m_t)
+            time.sleep(0.033)
 
 
     def _get_hand_state(self):
@@ -161,8 +200,16 @@ class LinkerHand(Node):
                 self.pub_hand_state(hand_state=hand_state)
                 time.sleep(0.02)
 
+    def _get_hand_state_v2(self):
+        if self.hand_state_pub.get_subscription_count() > 0:
+            self.last_hand_state['state'] = self.api.get_state()
+            self.last_hand_state['vel'] = self.api.get_joint_speed()
+
+
     def pub_hand_state(self,hand_state):
         state = hand_state['state']
+        if state[0] == -1:
+            return
         if self.hand_type == "left":
             state_arc = self.api.range_to_arc_left(state,self.hand_joint)
         if self.hand_type == "right":
@@ -209,6 +256,23 @@ class LinkerHand(Node):
                 self.pub_hand_info(dic=data)
             time.sleep(0.3)
 
+    def get_hand_info_v2(self):
+        if self.hand_info_pub.get_subscription_count() > 0:
+            data = {
+                "version": self.version, # Dexterous hand version number
+                "hand_joint": self.hand_joint, # Dexterous hand joint type
+                "speed": self.api.get_speed(), # Current speed threshold of the dexterous hand
+                "current": self.api.get_current(), # Current of the dexterous hand
+                "fault": self.api.get_fault(), # Current fault of the dexterous hand
+                "motor_temperature": self.api.get_temperature(), # Current motor temperature of the dexterous hand
+                "torque": self.api.get_torque(), # Current torque of the dexterous hand
+                "is_touch":self.is_touch,
+                "touch_type": self.touch_type,
+                "finger_order": self.api.get_finger_order() # Finger motor order
+            }
+            self.last_hand_info = data
+            # self.pub_hand_info(dic=data)
+
     def pub_hand_info(self,dic):
         msg = String()
         msg.data = json.dumps(dic)
@@ -254,13 +318,26 @@ class LinkerHand(Node):
                     self.matrix_touch_pub.publish(m_t)
             time.sleep(0.01)
 
+    def get_matrix_touch_v2(self):
+        if self.matrix_touch_pub.get_subscription_count() > 0:
+            if self.touch_type == 2:
+                thumb_matrix, index_matrix , middle_matrix , ring_matrix , little_matrix = self.api.get_matrix_touch_v2()
+                matrix_dic = {
+                    "thumb_matrix":thumb_matrix.tolist(),
+                    "index_matrix":index_matrix.tolist(),
+                    "middle_matrix":middle_matrix.tolist(),
+                    "ring_matrix":ring_matrix.tolist(),
+                    "little_matrix":little_matrix.tolist()
+                }
+                self.matrix_dic = matrix_dic
+                
+
     def left_hand_control_cb(self,msg):
         now = time.time()
         if now - self.last_process_time < self.min_interval:
             return  # 丢弃当前帧，限频处理
         self.last_process_time = now
         '''左手接收控制topic回调 for range'''
-        pose = list(msg.position)
         self.api.finger_move(pose=list(msg.position))
         vel = list(msg.velocity)
         self.vel = vel
@@ -416,13 +493,19 @@ class LinkerHand(Node):
     def close_can(self):
         self.open_can.close_can0()
         sys.exit(0)
+
         
 def main(args=None):
     rclpy.init(args=args)
     node = LinkerHand("linker_hand_sdk")
-    
+    embedded_version = node.embedded_version
     try:
-        node.run()               # 初始化线程或其他操作
+        if embedded_version is not None and isinstance(embedded_version, list) and embedded_version and embedded_version[0] == 10 and embedded_version[4]>35:
+            ColorMsg(msg=f"L10 New Matrix Touch For SDK V2", color="green")
+            node.run_v2()
+        else:
+            ColorMsg(msg=f"SDK V1", color="green")
+            node.run()               # 初始化线程或其他操作
         rclpy.spin(node)         # 主循环，监听 ROS 回调
     except KeyboardInterrupt:
         print("收到 Ctrl+C，准备退出...")

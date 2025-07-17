@@ -57,8 +57,11 @@ class LinkerHandApi:
             if not self.is_can:
                 ColorMsg(msg=f"{self.can} interface is not open", color="red")
                 sys.exit(1)
-        version = self.get_version()
-        ColorMsg(msg=f"Embedded:{version}", color="green")
+        version = self.get_embedded_version()
+        if version == None or len(version) == 0:
+            ColorMsg(msg="Warning: Hardware version number not recognized, it is recommended to terminate the program and re insert USB to CAN conversion", color="yellow")
+        else:
+            ColorMsg(msg=f"Embedded:{version}", color="green")
     
     # Five-finger movement
     def finger_move(self, pose=[]):
@@ -144,9 +147,8 @@ class LinkerHandApi:
         else:
             pass
 
-    def get_version(self):
-        '''Get version'''
-        
+    def get_embedded_version(self):
+        '''Get embedded version'''
         return self.hand.get_version()
     
     def get_current(self):
@@ -194,6 +196,9 @@ class LinkerHandApi:
     
     def get_matrix_touch(self):
         return self.hand.get_matrix_touch()
+    
+    def get_matrix_touch_v2(self):
+        return self.hand.get_matrix_touch_v2()
 
     def get_torque(self):
         '''Get current maximum torque'''

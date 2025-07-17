@@ -36,6 +36,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
   $ cd linker_hand_ros2_sdk/
   $ colcon build --symlink-install
   $ source ./install/setup.bash
+  $ sudo chmod a+x src/linker_hand_ros2_sdk/linker_hand_ros2_sdk/linker_hand_ros2_sdk/linker_hand.py
   $ ros2 launch linker_hand_ros2_sdk linker_hand.launch.py
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  Current SDK version: 2.1.4
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  left L10 set speed to [200, 250, 250, 250, 250, 250, 250, 250, 250, 250]
