@@ -783,3 +783,7 @@ class LinkerHandL25Can:
         l25_pose[28] = 0.0
         l25_pose[29] = pose[24]
         return l25_pose
+    
+
+    def show_fun_table(self):
+        pass

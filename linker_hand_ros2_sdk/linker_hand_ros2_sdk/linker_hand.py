@@ -487,6 +487,8 @@ class LinkerHand(Node):
             if data["setting_cmd"] == "set_electric_current": # Set current
                 if isinstance(data["params"]["current"], list) == True:
                     hand.set_current(data["params"]["current"])
+            if data["setting_cmd"] == "show_fun_table": # Get faults
+                f = hand.show_fun_table()
         except:
             print("命令参数错误")
 

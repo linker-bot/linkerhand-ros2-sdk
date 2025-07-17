@@ -371,6 +371,10 @@ class LinkerHandL20Can:
     def get_force(self):
         '''Get pressure sensor data'''
         return [self.normal_force,self.tangential_force,self.tangential_force_dir,self.approach_inc]
+    
+    def show_fun_table(self):
+        pass
+
     def close_can_interface(self):
         if self.bus:
             self.bus.shutdown()  # Close CAN bus

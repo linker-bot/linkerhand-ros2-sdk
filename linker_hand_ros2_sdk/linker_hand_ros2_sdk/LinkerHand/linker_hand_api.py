@@ -69,9 +69,6 @@ class LinkerHandApi:
         Five-finger movement
         @params: pose list L7 len(7) | L10 len(10) | L20 len(20) | L25 len(25) 0~255
         '''
-        # if pose == self.last_position:
-        #     return
-        #ColorMsg(msg=f"Current LinkerHand is {self.hand_type} {self.hand_joint}, action sequence is {pose}", color="green")
         
         if len(pose) == 0 or self.last_position == pose:
             return
@@ -252,7 +249,8 @@ class LinkerHandApi:
     def arc_to_range_right(self,state,hand_joint):
         return arc_to_range_right(right_arc=state,hand_joint=hand_joint)
     
-
+    def show_fun_table(self):
+        self.hand.show_fun_table()
     def close_can(self):
         self.open_can.close_can0()                         
 

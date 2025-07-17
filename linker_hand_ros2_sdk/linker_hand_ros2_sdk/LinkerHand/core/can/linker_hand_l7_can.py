@@ -3,6 +3,7 @@ import time, sys
 import threading
 import numpy as np
 from utils.open_can import OpenCan
+from utils.color_msg import ColorMsg
 
 
 class LinkerHandL7Can:
@@ -58,7 +59,8 @@ class LinkerHandL7Can:
             else:
                 raise EnvironmentError("Unsupported platform for CAN interface")
         except:
-            print("Please insert CAN device")
+            #print("Please insert CAN device")
+            ColorMsg(msg="Warning: Please insert CAN device", color="red")
 
     def send_frame(self, frame_property, data_list,sleep=0.005):
         """Send a single CAN frame with specified properties and data."""
@@ -290,6 +292,9 @@ class LinkerHandL7Can:
         '''Get faults.'''
         self.get_motor_fault_code()
         return self.x35
+    
+    def show_fun_table(self):
+        pass
 
     def close_can_interface(self):
         """Stop the CAN communication."""

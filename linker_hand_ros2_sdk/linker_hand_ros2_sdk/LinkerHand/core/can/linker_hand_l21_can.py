@@ -748,7 +748,9 @@ class LinkerHandL21Can:
             "ring_finger_tip",
             "little_finger_tip"
         ]
-
+    
+    def show_fun_table(self):
+        pass
     def close_can_interface(self):
         if self.bus:
             self.bus.shutdown()  # Close CAN bus
