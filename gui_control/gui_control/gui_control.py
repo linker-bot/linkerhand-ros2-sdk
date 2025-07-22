@@ -152,7 +152,7 @@ class GuiApp(QWidget):
             self.control_sliders.append(slider)
 
     def slider_value_changed(self):
-        all_values = [slider.value() for slider in self.control_sliders]
+        all_values = [int(slider.value()) for slider in self.control_sliders]
 
         sender_slider = self.sender()
         if sender_slider in self.slider_labels:

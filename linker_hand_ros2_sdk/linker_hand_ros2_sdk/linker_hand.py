@@ -195,7 +195,10 @@ class LinkerHand(Node):
         }
         while True:
             if self.hand_state_pub.get_subscription_count() > 0:
-                hand_state['state'] = self.api.get_state()
+                if self.hand_cmd_sub.get_publisher_count() > 0 or self.hand_cmd_arc_sub.get_publisher_count() > 0:
+                    hand_state['state'] = self.api.get_state_for_pub()
+                else:
+                    hand_state['state'] = self.api.get_state()
                 hand_state['vel'] = self.api.get_joint_speed()
                 self.pub_hand_state(hand_state=hand_state)
                 time.sleep(0.02)
@@ -316,7 +319,7 @@ class LinkerHand(Node):
                     m_t = String()
                     m_t.data = json.dumps(matrix_dic)
                     self.matrix_touch_pub.publish(m_t)
-            time.sleep(0.01)
+            time.sleep(0.15)
 
     def get_matrix_touch_v2(self):
         if self.matrix_touch_pub.get_subscription_count() > 0:

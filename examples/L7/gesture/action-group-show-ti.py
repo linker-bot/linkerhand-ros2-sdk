@@ -32,9 +32,10 @@ hand = {"joint1":255,   #拇指根部弯曲
 def main(args=None):
     rclpy.init(args=args)
     node = Node("dong_test_sender")
+    global show_step
     rate = 1.0 / 30  # 60 FPS
     #pub = node.create_publisher('/cb_left_hand_control_cmd', JointState, queue_size=10)
-    pub = node.create_publisher(JointState, '/cb_left_hand_control_cmd', 10)
+    pub = node.create_publisher(JointState, '/cb_right_hand_control_cmd', 10)
     now = node.get_clock().now()
     
     joint_state.header = Header()
@@ -54,6 +55,8 @@ def main(args=None):
         pub.publish(joint_state)
         time.sleep(rate)
         count = count + 1
+        if show_step==54:
+            show_step=0
         print(count)
 
 

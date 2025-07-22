@@ -1,0 +1,42 @@
+Channels:
+ - conda-forge
+ - defaults
+Platform: linux-64
+Collecting package metadata (repodata.json): - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | / - \ | done
+Solving environment: - \ done
+
+## Package Plan ##
+
+  environment location: /home/linkerhand/miniconda3/envs/sdk
+
+  added / updated specs:
+    - libstdcxx-ng
+
+
+The following packages will be downloaded:
+
+    package                    |            build
+    ---------------------------|-----------------
+    ca-certificates-2025.7.14  |       hbd8a1cb_0         152 KB  conda-forge
+    libstdcxx-ng-13.2.0        |       hc0a3c3a_7         3.7 MB  conda-forge
+    ------------------------------------------------------------
+                                           Total:         3.8 MB
+
+The following packages will be UPDATED:
+
+  ca-certificates    pkgs/main/linux-64::ca-certificates-2~ --> conda-forge/noarch::ca-certificates-2025.7.14-hbd8a1cb_0 
+  libstdcxx-ng       pkgs/main::libstdcxx-ng-11.2.0-h12345~ --> conda-forge::libstdcxx-ng-13.2.0-hc0a3c3a_7 
+
+
+Proceed ([y]/n)? 
+
+Downloading and Extracting Packages: ...working...libstdcxx-ng-13.2.0  | 3.7 MB    |            |   0% 
+ca-certificates-2025 | 152 KB    |            |   0% [A
+ca-certificates-2025 | 152 KB    | #          |  11% [Alibstdcxx-ng-13.2.0  | 3.7 MB    |            |   0% 
+ca-certificates-2025 | 152 KB    | ####2      |  42% [A
+ca-certificates-2025 | 152 KB    | ########## | 100% [A
+ca-certificates-2025 | 152 KB    | ########## | 100% [Alibstdcxx-ng-13.2.0  | 3.7 MB    | 2          |   2% libstdcxx-ng-13.2.0  | 3.7 MB    | 4          |   4% libstdcxx-ng-13.2.0  | 3.7 MB    | #1         |  12% libstdcxx-ng-13.2.0  | 3.7 MB    | ##5        |  26% libstdcxx-ng-13.2.0  | 3.7 MB    | ####1      |  42% libstdcxx-ng-13.2.0  | 3.7 MB    | #####8     |  58% libstdcxx-ng-13.2.0  | 3.7 MB    | ########3  |  83% libstdcxx-ng-13.2.0  | 3.7 MB    | ########## | 100% libstdcxx-ng-13.2.0  | 3.7 MB    | ########## | 100%                                                      
+                                                     [A done
+Preparing transaction: / done
+Verifying transaction: \ done
+Executing transaction: / done

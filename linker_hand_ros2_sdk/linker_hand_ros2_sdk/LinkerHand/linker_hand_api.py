@@ -155,6 +155,8 @@ class LinkerHandApi:
     def get_state(self):
         '''Get current joint state'''
         return self.hand.get_current_status()
+    def get_state_for_pub(self):
+        return self.hand.get_current_pub_status()
     
     def get_speed(self):
         '''Get speed'''
