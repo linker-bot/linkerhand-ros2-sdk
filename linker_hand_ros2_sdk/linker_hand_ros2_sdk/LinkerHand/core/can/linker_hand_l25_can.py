@@ -614,6 +614,13 @@ class LinkerHandL25Can:
         if len(state) == 30:
             l25_state = self.state_to_cmd(l25_state=state)
             return l25_state
+
+    def get_current_pub_status(self):
+        state= self.x41+ self.x42+ self.x43+ self.x44+ self.x45
+        if len(state) == 30:
+            l25_state = self.state_to_cmd(l25_state=state)
+            return l25_state
+        
     def get_current_state_topic(self):
         self.send_command(0x01,[])
         #time.sleep(0.001)

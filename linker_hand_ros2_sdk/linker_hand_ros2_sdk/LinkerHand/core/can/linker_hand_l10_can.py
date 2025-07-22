@@ -35,7 +35,7 @@ class LinkerHandL10Can:
         self.can_channel = can_channel
         self.baudrate = baudrate
         self.open_can = OpenCan(load_yaml=yaml)
-        
+        self.is_cmd = False
         self.x01 = [-1] * 5
         self.x02 = [-1] * 5
         self.x03 = [-1] * 5
@@ -116,10 +116,13 @@ class LinkerHandL10Can:
     def set_joint_positions(self, joint_angles):
         """Set the positions of 10 joints (joint_angles: list of 10 values)."""
         self.joint_angles = joint_angles
+        self.is_cmd = True
         # Send angle control in frames, L10 protocol splits into first 6 and last 4
         self.send_frame(FrameProperty.JOINT_POSITION2_RCO, self.joint_angles[6:])
         time.sleep(0.001)
         self.send_frame(FrameProperty.JOINT_POSITION_RCO, self.joint_angles[:6])
+        time.sleep(0.002)
+        self.is_cmd = False
         
 
     def set_max_torque_limits(self, pressures,type="get"):
@@ -279,13 +282,23 @@ class LinkerHandL10Can:
         '''Get version'''
         self.send_frame(0x64,[],sleep=0.1)
         return self.version
+    
     def get_current_status(self):
         '''Get current joint status'''
-        #if self.version != None and self.version[4] > 35:
-        self.send_frame(0x01,[],sleep=0.003)
-        self.send_frame(0x04,[],sleep=0.003)
+        if self.is_cmd == False:
+            #if self.version != None and self.version[4] > 35:
+            self.send_frame(0x01,[],sleep=0.003)
+            self.send_frame(0x04,[],sleep=0.003)
+            state = self.x01 + self.x04
+            return state
+        else:
+            state = self.x01 + self.x04
+            return state
+        
+    def get_current_pub_status(self):
         state = self.x01 + self.x04
         return state
+        
     def get_speed(self):
         '''Get current speed'''
         self.send_frame(0x05,[],sleep=0.003)

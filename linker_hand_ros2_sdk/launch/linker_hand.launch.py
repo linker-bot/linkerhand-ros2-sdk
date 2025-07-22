@@ -11,8 +11,8 @@ def generate_launch_description():
             name='linker_hand_sdk',
             output='screen',
             parameters=[{
-                'hand_type': 'right',
-                'hand_joint': "L7",
+                'hand_type': 'left',
+                'hand_joint': "L10",
                 'is_touch': True,
                 'can': 'can0', # 这里需要修改为实际的CAN总线名称 如果是win系统则 PCAN_USBBUS1
             }],

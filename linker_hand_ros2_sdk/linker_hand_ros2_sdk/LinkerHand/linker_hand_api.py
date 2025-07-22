@@ -70,7 +70,7 @@ class LinkerHandApi:
         @params: pose list L7 len(7) | L10 len(10) | L20 len(20) | L25 len(25) 0~255
         '''
         
-        if len(pose) == 0 or self.last_position == pose:
+        if len(pose) == 0:
             return
         if any(not isinstance(x, (int, float)) or x < 0 or x > 255 for x in pose):
             ColorMsg(msg=f"The numerical range cannot be less than 0 or greater than 255",color="red")
@@ -114,6 +114,9 @@ class LinkerHandApi:
         if len(speed) < 5:
             print("数据长度不够,至少5个元素", flush=True)
             return
+        if self.hand_joint == "L7" and len(speed) < 7:
+            print("数据长度不够,至少7个元素", flush=True)
+            return
         ColorMsg(msg=f"{self.hand_type} {self.hand_joint} set speed to {speed}", color="green")
         self.hand.set_speed(speed=speed)
     
@@ -129,6 +132,9 @@ class LinkerHandApi:
             return
         if len(torque) < 5:
             print("数据长度不够,至少5个元素", flush=True)
+            return
+        if self.hand_joint == "L7" and len(torque) < 7:
+            print("数据长度不够,至少7个元素", flush=True)
             return
         ColorMsg(msg=f"{self.hand_type} {self.hand_joint} set maximum torque to {torque}", color="green")
         return self.hand.set_torque(torque=torque)
@@ -155,6 +161,7 @@ class LinkerHandApi:
     def get_state(self):
         '''Get current joint state'''
         return self.hand.get_current_status()
+    
     def get_state_for_pub(self):
         return self.hand.get_current_pub_status()
     

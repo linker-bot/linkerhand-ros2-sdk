@@ -226,12 +226,15 @@ class LinkerHandL7Can:
         return self.version
 
     def get_current_status(self):
+        print("7777777", flush=True)
         if self.is_lock:
             return self.x01
         elif self.is_lock == False:
             self.send_frame(0x01, [],sleep=0.003)
             return self.x01
+        
     def get_current_pub_status(self):
+        print("6666666", flush=True)
         return self.x01
 
     def get_speed(self):
