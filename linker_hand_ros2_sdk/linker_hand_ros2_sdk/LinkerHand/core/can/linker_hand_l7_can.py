@@ -43,6 +43,7 @@ class LinkerHandL7Can:
         self.pressures = [200] * 7  # Default torque 200
         self.bus = self.init_can_bus(can_channel, baudrate)
         self.normal_force, self.tangential_force, self.tangential_force_dir, self.approach_inc = [[0.0] * 7 for _ in range(4)]
+        self.is_lock = False
         self.version = None
         # Start the receiving thread
         self.running = True
@@ -83,12 +84,14 @@ class LinkerHandL7Can:
 
     def set_joint_positions(self, joint_angles):
         """Set the positions of 10 joints (joint_angles: list of 10 values)."""
+        self.is_lock = True
         if len(joint_angles) > 7:
             self.joint_angles = joint_angles[:7]
         else:
             self.joint_angles = joint_angles
         # Send angle control in frames
-        self.send_frame(0x01, self.joint_angles)
+        self.send_frame(0x01, self.joint_angles, sleep=0.003)
+        self.is_lock = False
 
     def set_max_torque_limits(self, pressures, type="get"):
         """Set maximum torque limits."""
@@ -223,9 +226,11 @@ class LinkerHandL7Can:
         return self.version
 
     def get_current_status(self):
-        #if self.version[4] > 50:
-        self.send_frame(0x01, [],sleep=0.003)
-        return self.x01
+        if self.is_lock:
+            return self.x01
+        elif self.is_lock == False:
+            self.send_frame(0x01, [],sleep=0.003)
+            return self.x01
 
     def get_speed(self):
         self.send_frame(0x05, [],sleep=0.003)
