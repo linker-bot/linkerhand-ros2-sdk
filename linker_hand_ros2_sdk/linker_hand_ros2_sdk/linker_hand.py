@@ -316,7 +316,7 @@ class LinkerHand(Node):
                     m_t = String()
                     m_t.data = json.dumps(matrix_dic)
                     self.matrix_touch_pub.publish(m_t)
-            time.sleep(0.01)
+            time.sleep(0.05)
 
     def get_matrix_touch_v2(self):
         if self.matrix_touch_pub.get_subscription_count() > 0:
