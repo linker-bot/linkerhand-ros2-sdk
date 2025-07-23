@@ -244,7 +244,7 @@ class LinkerHand(Node):
         while True:
             if self.hand_info_pub.get_subscription_count() > 0:
                 data = {
-                    "version": self.version, # Dexterous hand version number
+                    "version": self.embedded_version, # Dexterous hand version number
                     "hand_joint": self.hand_joint, # Dexterous hand joint type
                     "speed": self.api.get_speed(), # Current speed threshold of the dexterous hand
                     "current": self.api.get_current(), # Current of the dexterous hand
@@ -262,7 +262,7 @@ class LinkerHand(Node):
     def get_hand_info_v2(self):
         if self.hand_info_pub.get_subscription_count() > 0:
             data = {
-                "version": self.version, # Dexterous hand version number
+                "version": self.embedded_version, # Dexterous hand version number
                 "hand_joint": self.hand_joint, # Dexterous hand joint type
                 "speed": self.api.get_speed(), # Current speed threshold of the dexterous hand
                 "current": self.api.get_current(), # Current of the dexterous hand
