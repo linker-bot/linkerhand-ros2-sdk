@@ -226,7 +226,6 @@ class LinkerHandL7Can:
         return self.version
 
     def get_current_status(self):
-        print("7777777", flush=True)
         if self.is_lock:
             return self.x01
         elif self.is_lock == False:
@@ -234,7 +233,6 @@ class LinkerHandL7Can:
             return self.x01
         
     def get_current_pub_status(self):
-        print("6666666", flush=True)
         return self.x01
 
     def get_speed(self):
@@ -287,6 +285,14 @@ class LinkerHandL7Can:
         self.send_frame(0xb4,[0xc6],sleep=0.01)
         self.send_frame(0xb5,[0xc6],sleep=0.01)
 
+        return self.thumb_matrix , self.index_matrix , self.middle_matrix , self.ring_matrix , self.little_matrix
+    
+    def get_matrix_touch_v2(self):
+        self.send_frame(0xb1,[0xc6],sleep=0.005)
+        self.send_frame(0xb2,[0xc6],sleep=0.005)
+        self.send_frame(0xb3,[0xc6],sleep=0.005)
+        self.send_frame(0xb4,[0xc6],sleep=0.005)
+        self.send_frame(0xb5,[0xc6],sleep=0.005)
         return self.thumb_matrix , self.index_matrix , self.middle_matrix , self.ring_matrix , self.little_matrix
 
     def get_force(self):

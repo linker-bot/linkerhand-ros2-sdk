@@ -495,6 +495,7 @@ class LinkerHand(Node):
         except:
             print("命令参数错误")
 
+
     def close_can(self):
         self.open_can.close_can0()
         sys.exit(0)
@@ -505,12 +506,12 @@ def main(args=None):
     node = LinkerHand("linker_hand_sdk")
     embedded_version = node.embedded_version
     try:
-        if embedded_version is not None and isinstance(embedded_version, list) and embedded_version and embedded_version[0] == 10 and embedded_version[4]>35:
-            ColorMsg(msg=f"L10 New Matrix Touch For SDK V2", color="green")
+        if len(embedded_version) > 0 and ((embedded_version[0]==10 and embedded_version[4]>35) or (embedded_version[0]==7 and embedded_version[4]>50)):
+            ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
             node.run_v2()
         else:
             ColorMsg(msg=f"SDK V1", color="green")
-            node.run()               # 初始化线程或其他操作
+            node.run()
         rclpy.spin(node)         # 主循环，监听 ROS 回调
     except KeyboardInterrupt:
         print("收到 Ctrl+C，准备退出...")

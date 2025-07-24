@@ -122,6 +122,11 @@ class LinkerHandApi:
     
     def set_joint_speed(self, speed=[100]*5):
         '''Set speed by topic'''
+        if len(speed) == 0:
+            return
+        if any(not isinstance(x, (int, float)) or x < 10 or x > 255 for x in speed):
+            ColorMsg(msg=f"The numerical range cannot be less than 10 or greater than 255",color="red")
+            return
         self.hand.set_speed(speed=speed)
     
     def set_torque(self, torque=[180] * 5):
