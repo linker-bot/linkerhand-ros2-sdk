@@ -506,7 +506,7 @@ def main(args=None):
     node = LinkerHand("linker_hand_sdk")
     embedded_version = node.embedded_version
     try:
-        if len(embedded_version) > 0 and ((embedded_version[0]==10 and embedded_version[4]>35) or (embedded_version[0]==7 and embedded_version[4]>50)):
+        if len(embedded_version) > 4 and ((embedded_version[0]==10 and embedded_version[4]>35) or (embedded_version[0]==7 and embedded_version[4]>50)):
             ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
             node.run_v2()
         else:
