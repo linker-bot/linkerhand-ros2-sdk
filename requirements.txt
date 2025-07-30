@@ -10,11 +10,9 @@ h5py
 PyYAML
 tqdm
 wandb
-pybullet
 mediapipe
 pyqt5
 pyqtgraph
 dm_control
 uvicorn
-mujoco
 tabulate
