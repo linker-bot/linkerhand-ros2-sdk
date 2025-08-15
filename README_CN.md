@@ -91,6 +91,9 @@ $ ros2 topic echo /cb_left_hand_control_cmd
 
 ## 版本更新
 
+- > ### release_2.1.9
+ - 1、支持O6版本灵巧手
+
 - > ### release_2.1.8
  - 1、修复偶发撞帧问题
 
