@@ -24,7 +24,7 @@ class LinkerHand(Node):
         super().__init__(name)
         # 声明参数（带默认值）
         self.declare_parameter('hand_type', 'left')
-        self.declare_parameter('hand_joint', 'L10')
+        self.declare_parameter('hand_joint', 'L6')
         self.declare_parameter('is_touch', False)
         self.declare_parameter('can', 'can0')
         
@@ -110,7 +110,7 @@ class LinkerHand(Node):
         pose = None
         torque = [200, 200, 200, 200, 200]
         speed = [200, 250, 250, 250, 250]
-        if self.hand_joint.upper() == "O6":
+        if self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6":
             pose = [200, 255, 255, 255, 255, 180]
             torque = [250, 250, 250, 250, 250, 250]
             speed = [250, 250, 250, 250, 250, 250]
@@ -148,17 +148,17 @@ class LinkerHand(Node):
         self.thread_get_info.daemon = True
         self.thread_get_info.start()
         # self.thread_get_info.join()
-
-        if self.touch_type == 2:
-            self.thread_get_matrix_touch = threading.Thread(target=self.get_matrix_touch)
-            self.thread_get_matrix_touch.daemon = True
-            self.thread_get_matrix_touch.start()
-            # self.thread_get_matrix_touch.join()
-        elif self.touch_type != -1 and self.touch_type != 2:
-            self.thread_get_touch = threading.Thread(target=self.get_hand_touch)
-            self.thread_get_touch.daemon = True
-            self.thread_get_touch.start()
-            # self.thread_get_touch.join()
+        if self.is_touch == True:
+            if self.touch_type == 2:
+                self.thread_get_matrix_touch = threading.Thread(target=self.get_matrix_touch)
+                self.thread_get_matrix_touch.daemon = True
+                self.thread_get_matrix_touch.start()
+                # self.thread_get_matrix_touch.join()
+            elif self.touch_type != -1 and self.touch_type != 2:
+                self.thread_get_touch = threading.Thread(target=self.get_hand_touch)
+                self.thread_get_touch.daemon = True
+                self.thread_get_touch.start()
+                # self.thread_get_touch.join()
 
 
     def run_v2(self):
@@ -173,7 +173,7 @@ class LinkerHand(Node):
         count = 0
         while True:
             self._get_hand_state_v2()
-            if count % 3 == 0:
+            if count % 3 == 0 and self.is_touch == True:
                 self.get_matrix_touch_v2()
             if count % 5 == 0:
                 self.get_hand_info_v2()
@@ -188,7 +188,8 @@ class LinkerHand(Node):
             self.pub_hand_state(hand_state=self.last_hand_state)
             self.pub_hand_info(dic=self.last_hand_info)
             m_t.data = json.dumps(self.matrix_dic)
-            self.matrix_touch_pub.publish(m_t)
+            if self.is_touch == True:
+                self.matrix_touch_pub.publish(m_t)
             time.sleep(0.033)
 
 
@@ -200,17 +201,29 @@ class LinkerHand(Node):
         while True:
             if self.hand_state_pub.get_subscription_count() > 0:
                 if self.hand_cmd_sub.get_publisher_count() > 0 or self.hand_cmd_arc_sub.get_publisher_count() > 0:
-                    hand_state['state'] = self.api.get_state_for_pub()
+                    state = self.api.get_state_for_pub()
                 else:
-                    hand_state['state'] = self.api.get_state()
-                hand_state['vel'] = self.api.get_joint_speed()
+                    state = self.api.get_state()
+                vel = self.api.get_joint_speed()
+                if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                    hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
+                    hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
+                else:
+                    hand_state['state'] = state
+                    hand_state['vel'] = vel
                 self.pub_hand_state(hand_state=hand_state)
                 time.sleep(0.02)
 
     def _get_hand_state_v2(self):
         if self.hand_state_pub.get_subscription_count() > 0:
-            self.last_hand_state['state'] = self.api.get_state()
-            self.last_hand_state['vel'] = self.api.get_joint_speed()
+            state = self.api.get_state()
+            vel = self.api.get_joint_speed()
+            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                self.last_hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
+                self.last_hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
+            else:
+                self.last_hand_state['state'] = state
+                self.last_hand_state['vel'] = vel
 
 
     def pub_hand_state(self,hand_state):
@@ -344,14 +357,29 @@ class LinkerHand(Node):
         if now - self.last_process_time < self.min_interval:
             return  # 丢弃当前帧，限频处理
         self.last_process_time = now
-        '''左手接收控制topic回调 for range'''
-        self.api.finger_move(pose=list(msg.position))
+        tmp_pose = [0] * 6
+        pose = list(msg.position)
+        if len(pose) == 0:
+            return
+        else:
+            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                tmp_pose[0] = pose[0]
+                tmp_pose[1] = pose[2]
+                tmp_pose[2] = pose[3]
+                tmp_pose[3] = pose[4]
+                tmp_pose[4] = pose[5]
+                tmp_pose[5] = pose[1]
+                '''左手接收控制topic回调 for range'''
+                self.api.finger_move(pose=tmp_pose)
+            else:
+                '''左手接收控制topic回调 for range'''
+                self.api.finger_move(pose=pose)
         vel = list(msg.velocity)
         self.vel = vel
         if all(x == 0 for x in vel):
             return
         else:
-            if str(self.hand_joint).upper() == "O6" and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -383,7 +411,7 @@ class LinkerHand(Node):
         if all(x == 0 for x in vel):
             return
         else:
-            if str(self.hand_joint).upper() == "O6" and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -409,13 +437,29 @@ class LinkerHand(Node):
         self.last_process_time = now
         '''右手接收控制topic回调 for range'''
         pose = list(msg.position)
+        tmp_pose = [0] * 6
+        if len(pose) == 0:
+            return
+        else:
+            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                tmp_pose[0] = pose[0]
+                tmp_pose[1] = pose[2]
+                tmp_pose[2] = pose[3]
+                tmp_pose[3] = pose[4]
+                tmp_pose[4] = pose[5]
+                tmp_pose[5] = pose[1]
+                '''左手接收控制topic回调 for range'''
+                self.api.finger_move(pose=tmp_pose)
+            else:
+                '''左手接收控制topic回调 for range'''
+                self.api.finger_move(pose=pose)
         self.api.finger_move(pose=list(msg.position))
         vel = list(msg.velocity)
         self.vel = vel
         if all(x == 0 for x in vel):
             return
         else:
-            if str(self.hand_joint).upper() == "O6" and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -447,7 +491,7 @@ class LinkerHand(Node):
         if all(x == 0 for x in vel):
             return
         else:
-            if str(self.hand_joint).upper() == "O6" and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
