@@ -362,18 +362,8 @@ class LinkerHand(Node):
         if len(pose) == 0:
             return
         else:
-            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                tmp_pose[0] = pose[0]
-                tmp_pose[1] = pose[2]
-                tmp_pose[2] = pose[3]
-                tmp_pose[3] = pose[4]
-                tmp_pose[4] = pose[5]
-                tmp_pose[5] = pose[1]
-                '''左手接收控制topic回调 for range'''
-                self.api.finger_move(pose=tmp_pose)
-            else:
-                '''左手接收控制topic回调 for range'''
-                self.api.finger_move(pose=pose)
+            '''左手接收控制topic回调 for range'''
+            self.api.finger_move(pose=pose)
         vel = list(msg.velocity)
         self.vel = vel
         if all(x == 0 for x in vel):
@@ -441,18 +431,8 @@ class LinkerHand(Node):
         if len(pose) == 0:
             return
         else:
-            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                tmp_pose[0] = pose[0]
-                tmp_pose[1] = pose[2]
-                tmp_pose[2] = pose[3]
-                tmp_pose[3] = pose[4]
-                tmp_pose[4] = pose[5]
-                tmp_pose[5] = pose[1]
-                '''左手接收控制topic回调 for range'''
-                self.api.finger_move(pose=tmp_pose)
-            else:
-                '''左手接收控制topic回调 for range'''
-                self.api.finger_move(pose=pose)
+            '''左手接收控制topic回调 for range'''
+            self.api.finger_move(pose=pose)
         self.api.finger_move(pose=list(msg.position))
         vel = list(msg.velocity)
         self.vel = vel
