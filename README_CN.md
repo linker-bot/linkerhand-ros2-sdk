@@ -1,7 +1,7 @@
 # LinkerHand灵巧手ROS2 SDK
 
 ## 概述
-LinkerHand灵巧手ROS SDK 是灵心巧手(北京)科技有限公司开发，用于L7、O7、L10、O10等LinkerHand灵巧手的驱动软件和功能示例源码。可用于真机与仿真器使用。
+LinkerHand灵巧手ROS SDK 是灵心巧手(北京)科技有限公司开发，用于L6(O6\L6P)、L7、O7、L10、O10等LinkerHand灵巧手的驱动软件和功能示例源码。可用于真机与仿真器使用。
 LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 
 ## 安装
