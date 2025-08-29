@@ -200,10 +200,7 @@ class LinkerHand(Node):
         }
         while True:
             if self.hand_state_pub.get_subscription_count() > 0:
-                if self.hand_cmd_sub.get_publisher_count() > 0 or self.hand_cmd_arc_sub.get_publisher_count() > 0:
-                    state = self.api.get_state_for_pub()
-                else:
-                    state = self.api.get_state()
+                state = self.api.get_state()
                 vel = self.api.get_joint_speed()
                 if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
                     hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
