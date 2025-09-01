@@ -202,12 +202,8 @@ class LinkerHand(Node):
             if self.hand_state_pub.get_subscription_count() > 0:
                 state = self.api.get_state()
                 vel = self.api.get_joint_speed()
-                if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                    hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
-                    hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
-                else:
-                    hand_state['state'] = state
-                    hand_state['vel'] = vel
+                hand_state['state'] = state
+                hand_state['vel'] = vel
                 self.pub_hand_state(hand_state=hand_state)
                 time.sleep(0.02)
 
@@ -215,12 +211,8 @@ class LinkerHand(Node):
         if self.hand_state_pub.get_subscription_count() > 0:
             state = self.api.get_state()
             vel = self.api.get_joint_speed()
-            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                self.last_hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
-                self.last_hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
-            else:
-                self.last_hand_state['state'] = state
-                self.last_hand_state['vel'] = vel
+            self.last_hand_state['state'] = state
+            self.last_hand_state['vel'] = vel
 
 
     def pub_hand_state(self,hand_state):
