@@ -11,7 +11,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 ```bash
   $ mkdir -p linker_hand_ros2_sdk/src
   $ cd linker_hand_ros2_sdk/src
-  $ git clone https://github.com/linker-bot/linkerhand-ros2-sdk.git
+  $ git clone https://github.com/linkerbotai/linker_hand_ros2_sdk.git
 ```
 
 - 编译
@@ -52,7 +52,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 ```bash
   $ mkdir -p linker_hand_ros2_sdk/src
   $ cd linker_hand_ros2_sdk/src
-  $ git clone https://github.com/linker-bot/linkerhand-ros2-sdk.git
+  $ git clone https://github.com/linkerbotai/linker_hand_ros2_sdk.git
   $ cd linker_hand_ros2_sdk/
   $ set PYTHONUTF8=1 # 设置环境变量为UTF-8编码
   $ colcon build --symlink-install
@@ -79,8 +79,6 @@ $ ros2 topic echo /cb_left_hand_control_cmd
   velocity: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
   effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 ```
-  L6:  ["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲","小拇指弯曲"]
-
   L7:  ["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲","小拇指弯曲","拇指旋转"]
 
   L10: ["拇指根部", "拇指侧摆","食指根部", "中指根部", "无名指根部","小指根部","食指侧摆","无名指侧摆","小指侧摆","拇指旋转"]

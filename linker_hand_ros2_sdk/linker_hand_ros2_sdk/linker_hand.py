@@ -199,20 +199,29 @@ class LinkerHand(Node):
             'vel':[]
         }
         while True:
-            if self.hand_state_pub.get_subscription_count() > 0:
+            if self.hand_state_pub.get_subscription_count() > 0 or self.hand_state_arc_pub.get_subscription_count() > 0:
                 state = self.api.get_state()
                 vel = self.api.get_joint_speed()
-                hand_state['state'] = state
-                hand_state['vel'] = vel
+                if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                    hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
+                    hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
+                else:
+                    hand_state['state'] = state
+                    hand_state['vel'] = vel
                 self.pub_hand_state(hand_state=hand_state)
                 time.sleep(0.02)
 
     def _get_hand_state_v2(self):
-        if self.hand_state_pub.get_subscription_count() > 0:
+        if self.hand_state_pub.get_subscription_count() > 0 or self.hand_state_arc_pub.get_subscription_count() > 0:
             state = self.api.get_state()
             vel = self.api.get_joint_speed()
-            self.last_hand_state['state'] = state
-            self.last_hand_state['vel'] = vel
+            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                self.last_hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
+                self.last_hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
+            else:
+                self.last_hand_state['state'] = state
+                self.last_hand_state['vel'] = vel
+
 
 
     def pub_hand_state(self,hand_state):
@@ -220,9 +229,10 @@ class LinkerHand(Node):
         if state[0] == -1:
             return
         if self.hand_type == "left":
-            state_arc = self.api.range_to_arc_left(state,self.hand_joint)
+            s_a = self.api.range_to_arc_left(state,self.hand_joint)
         if self.hand_type == "right":
-            state_arc = self.api.range_to_arc_right(state,self.hand_joint)
+            s_a = self.api.range_to_arc_right(state,self.hand_joint)
+        state_arc = [round(x, 2) for x in s_a]
         vel = hand_state['vel']
         if state == None:
             return
