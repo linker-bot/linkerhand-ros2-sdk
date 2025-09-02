@@ -176,7 +176,12 @@ def arc_to_range_left(left_arc,hand_joint):
     '''
 def arc_to_range_left(hand_arc_l,hand_joint):
     num=0
-    if hand_joint == "L7":
+    if hand_joint == "L6":
+        num = 6
+        l_min = l6_l_min
+        l_max = l6_l_max
+        l_derict = l6_l_derict
+    elif hand_joint == "L7":
         num = 7
         l_min = l7_l_min
         l_max = l7_l_max
@@ -214,7 +219,12 @@ def arc_to_range_left(hand_arc_l,hand_joint):
 
 def arc_to_range_right(right_arc,hand_joint):
     num=0
-    if hand_joint == "L7":
+    if hand_joint == "L6":
+        num = 6
+        r_min = l6_r_min
+        r_max = l6_r_max
+        r_derict = l6_r_derict
+    elif hand_joint == "L7":
         num = 7
         r_min = l7_r_min
         r_max = l7_r_max
