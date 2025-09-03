@@ -536,7 +536,7 @@ class LinkerHand(Node):
 
 
     def close_can(self):
-        self.open_can.close_can0()
+        self.open_can.close_can(can=self.can)
         sys.exit(0)
 
         
