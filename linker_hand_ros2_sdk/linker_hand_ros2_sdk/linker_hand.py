@@ -88,9 +88,13 @@ class LinkerHand(Node):
             self.hand_info_pub = self.create_publisher(String, '/cb_left_hand_info', 10)
             if self.is_touch == True:
                 if self.touch_type == 2:
+                    ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                     self.matrix_touch_pub = self.create_publisher(String, '/cb_left_hand_matrix_touch', 10)
                 elif self.touch_type != -1:
+                    ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
                     self.touch_pub = self.create_publisher(Float32MultiArray, '/cb_left_hand_force', 10)
+                else:
+                    ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Not equipped with any pressure sensors", color="red")
         elif hand_type == "right":
             self.api = LinkerHandApi(hand_type=hand_type, hand_joint=self.hand_joint,can=self.can)
             self.open_can.open_can(self.can)
@@ -103,9 +107,13 @@ class LinkerHand(Node):
             self.hand_info_pub = self.create_publisher(String, '/cb_right_hand_info', 10)
             if self.is_touch == True:
                 if self.touch_type == 2:
+                    ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                     self.matrix_touch_pub = self.create_publisher(String, '/cb_right_hand_matrix_touch', 10)
                 elif self.touch_type != -1:
+                    ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
                     self.touch_pub = self.create_publisher(Float32MultiArray, '/cb_right_hand_force', 10)
+                else:
+                    ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Not equipped with any pressure sensors", color="red")
         self.embedded_version = self.api.get_embedded_version()
         pose = None
         torque = [200, 200, 200, 200, 200]
@@ -113,7 +121,8 @@ class LinkerHand(Node):
         if self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6":
             pose = [200, 255, 255, 255, 255, 180]
             torque = [250, 250, 250, 250, 250, 250]
-            speed = [250, 250, 250, 250, 250, 250]
+            # O6 最大速度阈值
+            speed = [200, 250, 250, 250, 250, 250]
         elif self.hand_joint == "L7":
             # The data length of L7 is 7, reinitialize here
             pose = [255, 200, 255, 255, 255, 255, 180]
@@ -173,7 +182,7 @@ class LinkerHand(Node):
         count = 0
         while True:
             self._get_hand_state_v2()
-            if count % 3 == 0 and self.is_touch == True:
+            if count % 3 == 0 and self.is_touch == True and self.touch_type == 2: # 如果配置了压感并且压感验证了类型为矩阵式压感
                 self.get_matrix_touch_v2()
             if count % 5 == 0:
                 self.get_hand_info_v2()
@@ -188,7 +197,7 @@ class LinkerHand(Node):
             self.pub_hand_state(hand_state=self.last_hand_state)
             self.pub_hand_info(dic=self.last_hand_info)
             m_t.data = json.dumps(self.matrix_dic)
-            if self.is_touch == True:
+            if self.is_touch == True and self.touch_type == 2: # 如果配置了压感并且压感验证了类型为矩阵式压感
                 self.matrix_touch_pub.publish(m_t)
             time.sleep(0.033)
 
@@ -202,12 +211,12 @@ class LinkerHand(Node):
             if self.hand_state_pub.get_subscription_count() > 0 or self.hand_state_arc_pub.get_subscription_count() > 0:
                 state = self.api.get_state()
                 vel = self.api.get_joint_speed()
-                if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                    hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
-                    hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
-                else:
-                    hand_state['state'] = state
-                    hand_state['vel'] = vel
+                # if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
+                #     hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
+                #     hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
+                # else:
+                hand_state['state'] = state
+                hand_state['vel'] = vel
                 self.pub_hand_state(hand_state=hand_state)
                 time.sleep(0.02)
 
@@ -215,25 +224,23 @@ class LinkerHand(Node):
         if self.hand_state_pub.get_subscription_count() > 0 or self.hand_state_arc_pub.get_subscription_count() > 0:
             state = self.api.get_state()
             vel = self.api.get_joint_speed()
-            if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                self.last_hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
-                self.last_hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
-            else:
-                self.last_hand_state['state'] = state
-                self.last_hand_state['vel'] = vel
+            self.last_hand_state['state'] = state
+            self.last_hand_state['vel'] = vel
 
 
 
     def pub_hand_state(self,hand_state):
         state = hand_state['state']
+        vel = hand_state['vel']
         if state[0] == -1:
             return
         if self.hand_type == "left":
             s_a = self.api.range_to_arc_left(state,self.hand_joint)
         if self.hand_type == "right":
             s_a = self.api.range_to_arc_right(state,self.hand_joint)
+        
         state_arc = [round(x, 2) for x in s_a]
-        vel = hand_state['vel']
+        
         if state == None:
             return
         if all(x == 0 for x in  vel):
@@ -388,6 +395,8 @@ class LinkerHand(Node):
                 self.api.set_joint_speed(speed=speed)
 
     def left_hand_control_arc_cb(self,msg):
+        if self.hand_cmd_sub.get_publisher_count() > 0:
+            return
         now = time.time()
         if now - self.last_process_time < self.min_interval:
             return  # 丢弃当前帧，限频处理
@@ -430,7 +439,7 @@ class LinkerHand(Node):
         if len(pose) == 0:
             return
         else:
-            '''左手接收控制topic回调 for range'''
+            '''右手接收控制topic回调 for range'''
             self.api.finger_move(pose=pose)
         self.api.finger_move(pose=list(msg.position))
         vel = list(msg.velocity)
@@ -458,12 +467,15 @@ class LinkerHand(Node):
                 self.api.set_joint_speed(speed=speed)
 
     def right_hand_control_arc_cb(self,msg):
+        if self.hand_cmd_sub.get_publisher_count() > 0:
+            return
         now = time.time()
         if now - self.last_process_time < self.min_interval:
             return  # 丢弃当前帧，限频处理
         self.last_process_time = now
         '''右手接收控制topic回调 for arc'''
         pose_range = self.api.arc_to_range_right(msg.position,self.hand_joint)
+        print(pose_range, flush=True)
         self.api.finger_move(pose=list(pose_range))
         vel = list(msg.velocity)
         self.vel = vel

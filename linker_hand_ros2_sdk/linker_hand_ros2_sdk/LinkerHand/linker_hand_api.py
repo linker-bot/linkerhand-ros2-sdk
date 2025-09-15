@@ -167,19 +167,24 @@ class LinkerHandApi:
     def get_state(self):
         '''Get current joint state'''
         return self.hand.get_current_status()
+
     
     def get_state_for_pub(self):
         return self.hand.get_current_pub_status()
     
     def get_speed(self):
         '''Get speed'''
-        return self.hand.get_speed()
+        speed = self.hand.get_speed()
+        if self.hand_joint.upper() == "O6":
+            return self._motor_to_speed_sorting(hand_joint=self.hand_joint, speed=speed)
+        else:
+            return speed
     
     def get_joint_speed(self):
         speed = []
-        if self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6":
+        if self.hand_joint.upper() == "O6":
             return self.hand.get_speed()
-        elif self.hand_joint == "L7":
+        elif self.hand_joint == "L7" or self.hand_joint.upper() == "L6":
             return self.hand.get_speed()
         elif self.hand_joint == "L10":
             speed = self.hand.get_speed()

@@ -5,6 +5,7 @@ pyquaternion
 pyagxrobots
 pycryptodome
 ipython
+esdk-obs-python
 h5py
 PyYAML
 tqdm
