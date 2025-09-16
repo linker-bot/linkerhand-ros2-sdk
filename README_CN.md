@@ -136,7 +136,7 @@ gui_control界面控制灵巧手需要启动linker_hand_sdk_ros，以topic的形
 开启ROS2 SDK后
 
 &ensp;&ensp; __使用前请先将 [gui_control.launch.py](https://github.com/linkerbotai/linker_hand_ros2_sdk/blob/main/gui_control/launch/gui_control.launch.py)文件按照实际灵巧手参数进行配置.__
-- 注：如果界面显示乱码，需要安装字体，无桌面版Ubuntu必须安装字体
+- 注：如果界面显示乱码，需要安装字体，无桌面版Ubuntu使用X11转发模式，必须安装字体
 ```bash
 # 新开终端
 $ cd linker_hand_ros2_sdk/
