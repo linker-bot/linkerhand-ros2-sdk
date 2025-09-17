@@ -118,7 +118,7 @@ class LinkerHand(Node):
         pose = None
         torque = [200, 200, 200, 200, 200]
         speed = [200, 250, 250, 250, 250]
-        if self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6":
+        if self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6" or self.hand_joint.upper() == "L6P":
             pose = [200, 255, 255, 255, 255, 180]
             torque = [250, 250, 250, 250, 250, 250]
             # O6 最大速度阈值
@@ -375,7 +375,7 @@ class LinkerHand(Node):
         if all(x == 0 for x in vel):
             return
         else:
-            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6" or str(self.hand_joint).upper() == "L6P") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -409,7 +409,7 @@ class LinkerHand(Node):
         if all(x == 0 for x in vel):
             return
         else:
-            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6" or str(self.hand_joint).upper() == "L6P") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -447,7 +447,7 @@ class LinkerHand(Node):
         if all(x == 0 for x in vel):
             return
         else:
-            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6" or str(self.hand_joint).upper() == "L6P") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -482,7 +482,7 @@ class LinkerHand(Node):
         if all(x == 0 for x in vel):
             return
         else:
-            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6") and len(vel) == 6:
+            if (str(self.hand_joint).upper() == "O6" or str(self.hand_joint).upper() == "L6" or str(self.hand_joint).upper() == "L6P") and len(vel) == 6:
                 speed = vel
                 self.api.set_joint_speed(speed=speed)
             elif self.hand_joint == "L7" and len(vel) == 7:
@@ -557,7 +557,10 @@ def main(args=None):
     node = LinkerHand("linker_hand_sdk")
     embedded_version = node.embedded_version
     try:
-        if len(embedded_version) > 4 and ((embedded_version[0]==10 and embedded_version[4]>35) or (embedded_version[0]==7 and embedded_version[4]>50) or (embedded_version[0] == 6)):
+        if len(embedded_version) == 3:
+            ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
+            node.run_v2()
+        elif len(embedded_version) > 4 and ((embedded_version[0]==10 and embedded_version[4]>35) or (embedded_version[0]==7 and embedded_version[4]>50) or (embedded_version[0] == 6)):
             ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
             node.run_v2()
         else:
