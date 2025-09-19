@@ -89,25 +89,9 @@ class HandConfig:
                     "点赞": [255, 111, 0, 0, 0, 0, 86]
                 }
             ),
-            "L6": cls(
-                joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
-                init_pos=[250] * 6,
-                # preset_actions={
-                    
-                #     "张开": [250, 250, 250, 250, 250, 250],
-                #     "壹": [125, 18, 255, 0, 0, 0],
-                #     "贰": [92, 87, 255, 255, 0, 0],
-                #     "叁": [92, 87, 255, 255, 255, 0],
-                #     "肆": [92, 87, 255, 255, 255, 255],
-                #     "伍": [255, 255, 255, 255, 255, 255],
-                #     "OK": [96, 100, 118, 250, 250, 250],
-                #     "点赞": [250, 79, 0, 0, 0, 0],
-                #     "握拳": [102, 18, 0, 0, 0, 0],
-                    
-                # }
-            ),
             "O6": cls(
-                joint_names_en = ["index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch", "thumb_cmc_yaw", "thumb_cmc_pitch"],
+                # [103, 102, 111, 250, 250, 250] 对指
+                joint_names_en = ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
                 joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
                 init_pos=[250] * 6,
                 preset_actions={
@@ -125,7 +109,7 @@ class HandConfig:
                 }
             ),
             "L6": cls(
-                joint_names_en = ["index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch", "thumb_cmc_yaw", "thumb_cmc_pitch"],
+                joint_names_en = ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
                 joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
                 init_pos=[250] * 6,
                 preset_actions={
@@ -143,7 +127,7 @@ class HandConfig:
                 }
             ),
             "L6P": cls(
-                joint_names_en = ["index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch", "thumb_cmc_yaw", "thumb_cmc_pitch"],
+                joint_names_en = ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
                 joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
                 init_pos=[250] * 6,
                 preset_actions={
@@ -246,7 +230,7 @@ class ROS2NodeManager(QObject):
                         pose = range_to_arc_left(positions,self.hand_joint)
                     elif self.hand_type == "right":
                         pose = range_to_arc_right(positions,self.hand_joint)
-                elif self.hand_joint == "L6" or self.hand_joint == "L7" or self.hand_joint == "L21" or self.hand_joint == "L25":
+                elif self.hand_joint == "L7" or self.hand_joint == "L21" or self.hand_joint == "L25":
                     if self.hand_type == "left":
                         pose = range_to_arc_left(positions,self.hand_joint)
                     elif self.hand_type == "right":
