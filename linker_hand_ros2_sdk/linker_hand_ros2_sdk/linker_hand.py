@@ -182,11 +182,11 @@ class LinkerHand(Node):
         count = 0
         while True:
             self._get_hand_state_v2()
-            if count % 3 == 0 and self.is_touch == True and self.touch_type == 2: # 如果配置了压感并且压感验证了类型为矩阵式压感
+            if count % 5 == 0 and self.is_touch == True and self.touch_type == 2: # 如果配置了压感并且压感验证了类型为矩阵式压感
                 self.get_matrix_touch_v2()
-            if count % 5 == 0:
+            if count % 50 == 0:
                 self.get_hand_info_v2()
-            if count == 10:
+            if count == 100:
                 count = 0
             count += 1
             time.sleep(0.01)
