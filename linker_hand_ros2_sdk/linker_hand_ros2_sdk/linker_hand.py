@@ -67,7 +67,7 @@ class LinkerHand(Node):
         self.open_can = OpenCan()
         self.hand_setting_sub = self.create_subscription(String,'/cb_hand_setting_cmd', self.hand_setting_cb, 10)
         self.last_process_time = 0
-        self.max_hz = 30
+        self.max_hz = 15
         self.min_interval = 1.0 / self.max_hz
         self.lock = threading.Lock()
         self.init_hand(hand_type=self.hand_type)
