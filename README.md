@@ -16,7 +16,7 @@ The LinkerHand ROS2 SDK currently supports Ubuntu 22.04, ROS Humble, and Python 
 ```bash  
   $ mkdir -p linker_hand_ros2_sdk/src  
   $ cd linker_hand_ros2_sdk/src  
-  $ git clone https://github.com/linkerbotai/linker_hand_ros2_sdk.git  
+  $ https://github.com/linker-bot/linkerhand-ros2-sdk.git
 ```  
 
 - **Build**  
