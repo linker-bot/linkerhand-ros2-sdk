@@ -29,7 +29,8 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 
 &ensp;&ensp; __使用前请先将单手[linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py) or 双手[linker_hand_double.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand_double.launch.py)文件按照实际灵巧手参数进行配置.__
 
-- 启动SDK&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:L7/L10/L20/L21/L25
+- 启动SDK单手&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:O6/L6/L7/L10/L20/L21/L25
+- 启动SDK双手&ensp;&ensp;&ensp;&ensp;先将左手linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上，一般被识别为can0。再将右手linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上，一般识别为can1.  支持型号:O6/L6/L7/L10/L20/L21/L25
 ```bash
   # 开启CAN端口
   $ sudo /usr/sbin/ip link set can0 up type can bitrate 1000000 #USB转CAN设备蓝色灯常亮状态
