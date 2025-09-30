@@ -27,7 +27,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 - 修改setting.yaml配置文件的密码，默认PASSWORD："12345678" 
 默认密码为Ubuntu系统的密码，用户sdk自动开启CAN端口
 
-&ensp;&ensp; __使用前请先将 [linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将单手[linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py) or 双手[linker_hand_double.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand_double.launch.py)文件按照实际灵巧手参数进行配置.__
 
 - 启动SDK&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:L7/L10/L20/L21/L25
 ```bash
@@ -37,7 +37,10 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
   $ colcon build --symlink-install
   $ source ./install/setup.bash
   $ sudo chmod a+x src/linker_hand_ros2_sdk/linker_hand_ros2_sdk/linker_hand_ros2_sdk/linker_hand.py
+  $ # 单手
   $ ros2 launch linker_hand_ros2_sdk linker_hand.launch.py
+  $ # 双手
+  $ ros2 launch linker_hand_ros2_sdk linker_hand_double.launch.py
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  Current SDK version: 2.1.4
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  left L10 set speed to [200, 250, 250, 250, 250, 250, 250, 250, 250, 250]
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  left L10 set maximum torque to [200, 200, 200, 200, 200]
