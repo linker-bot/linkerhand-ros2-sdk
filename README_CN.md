@@ -69,7 +69,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 
 - position与手指关节对照表
 ```bash
-$ ros2 topic echo /cb_left_hand_control_cmd
+$ ros2 topic echo /cb_left_hand_control_cmd --flow-style
 ```
 ```bash
   header: 
@@ -82,6 +82,21 @@ $ ros2 topic echo /cb_left_hand_control_cmd
   position: [155.0, 162.0, 176.0, 125.0, 255.0, 255.0, 180.0, 179.0, 181.0, 68.0]
   velocity: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
   effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+```
+- state与手指关节对照表
+```bash
+$ ros2 topic echo /cb_left_hand_state --flow-style
+---
+header:
+  stamp:
+    sec: 1760593389
+    nanosec: 128827739
+  frame_id: ''
+name: []
+position: [200.0, 255.0, 254.0, 254.0, 254.0, 180.0]
+velocity: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+---
 ```
   O6:  ["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲","小拇指弯曲"]
 
