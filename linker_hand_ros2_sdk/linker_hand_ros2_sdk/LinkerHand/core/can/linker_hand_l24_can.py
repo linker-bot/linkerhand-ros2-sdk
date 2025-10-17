@@ -369,6 +369,21 @@ class LinkerHandL24Can:
             l24_state = self.state_to_cmd(l24_state=state)
             return l24_state
     
+    def get_thumb_matrix(self):
+        return None
+    
+    def get_index_matrix(self):
+        return None
+    
+    def get_middle_matrix(self):
+        return None
+    
+    def get_ring_matrix(self):
+        return None
+    
+    def get_little_matrix(self):
+        return None
+
     def get_speed(self,j=''):
         time.sleep(0.1)
         self.send_command(FrameProperty.THUMB_SPEED, j) # 大拇指速度

@@ -113,6 +113,8 @@ effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
   L25: ["大拇指根部", "食指根部", "中指根部","无名指根部","小拇指根部","大拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小拇指侧摆","大拇指横滚","预留","预留","预留","预留","大拇指中部","食指中部","中指中部","无名指中部","小拇指中部","大拇指指尖","食指指尖","中指指尖","无名指指尖","小拇指指尖"]
 
 ## 版本更新
+- > ### release_2.2.1
+ - 1、新增矩阵式压力传感器点阵热力示意图
 
 - > ### release_2.1.9
  - 1、支持O6/L6版本灵巧手
@@ -162,6 +164,17 @@ $ source ./install/setup.bash
 $ ros2 launch gui_control gui_control.launch.py
 ```
 开启后会弹出UI界面。通过滑动条可控制相应LinkerHand灵巧手关节运动
+
+- [matrix_touch_gui(矩阵式压感热力示意图)]
+矩阵式压感热力示意图可以通过显示LinkerHand灵巧手各个关节的指尖矩阵压力传感器数据，并以热力图的形式展示。确认灵巧手配备矩阵式压力传感器后才可使用。
+开启ROS2 SDK后
+&ensp;&ensp; __使用前请先将 [matrix_touch_gui.launch.py]文件按照实际灵巧手参数进行配置.__
+```bash
+# 新开终端
+$ cd linker_hand_ros2_sdk/
+$ source ./install/setup.bash
+$ ros2 launch matrix_touch_gui matrix_touch_gui.launch.py
+```
 
 ## WIN+ROS2环境下使用GUI
 &ensp;&ensp; __使用前请先将 [gui_control.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/gui_control/launch/gui_control.launch.py)文件按照实际灵巧手参数进行配置.__

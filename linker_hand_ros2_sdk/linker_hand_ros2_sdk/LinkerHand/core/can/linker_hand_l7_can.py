@@ -273,6 +273,25 @@ class LinkerHandL7Can:
             else:
                 return 1
 
+    def get_thumb_matrix(self):
+        self.send_frame(0xb1,[0xc6],sleep=0.005)
+        return self.thumb_matrix
+    
+    def get_index_matrix(self):
+        self.send_frame(0xb2,[0xc6],sleep=0.005)
+        return self.index_matrix
+    
+    def get_middle_matrix(self):
+        self.send_frame(0xb3,[0xc6],sleep=0.005)
+        return self.middle_matrix
+    
+    def get_ring_matrix(self):
+        self.send_frame(0xb4,[0xc6],sleep=0.005)
+        return self.ring_matrix
+    
+    def get_little_matrix(self):
+        self.send_frame(0xb5,[0xc6],sleep=0.005)
+        return self.little_matrix
 
     def get_touch(self):
         '''Get touch data'''

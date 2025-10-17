@@ -209,6 +209,25 @@ class LinkerHandApi:
     def get_touch(self):
         '''Get touch data'''
         return self.hand.get_touch()
+    def get_thumb_matrix(self):
+        """Get thumb matrix"""
+        return self.hand.get_thumb_matrix()
+    
+    def get_index_matrix(self):
+        """Get index matrix"""
+        return self.hand.get_index_matrix()
+    
+    def get_middle_matrix(self):
+        """Get middle matrix"""
+        return self.hand.get_middle_matrix()
+    
+    def get_ring_matrix(self):
+        """Get ring matrix"""
+        return self.hand.get_ring_matrix()
+    
+    def get_little_matrix(self):
+        """Get little matrix"""
+        return self.hand.get_little_matrix()
     
     def get_matrix_touch(self):
         return self.hand.get_matrix_touch()
