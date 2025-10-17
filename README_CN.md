@@ -168,7 +168,7 @@ $ ros2 launch gui_control gui_control.launch.py
 - [matrix_touch_gui(矩阵式压感热力示意图)]
 矩阵式压感热力示意图可以通过显示LinkerHand灵巧手各个关节的指尖矩阵压力传感器数据，并以热力图的形式展示。确认灵巧手配备矩阵式压力传感器后才可使用。
 开启ROS2 SDK后
-&ensp;&ensp; __使用前请先将 [matrix_touch_gui.launch.py]文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [matrix_touch_gui.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/matrix_touch_gui/launch/matrix_touch_gui.launch.py)文件按照实际灵巧手参数进行配置.__
 ```bash
 # 新开终端
 $ cd linker_hand_ros2_sdk/
