@@ -368,8 +368,6 @@ class LinkerHandL20Can:
             if self.normal_force[0] == -1:
                 return -1
     
-    
-
     def get_touch(self):
         '''Get touch data'''
         self.send_command(0xb1,[],sleep=0.03)
@@ -378,26 +376,6 @@ class LinkerHandL20Can:
         self.send_command(0xb4,[],sleep=0.03)
         self.send_command(0xb5,[],sleep=0.03)
         return [self.xb1[1],self.xb2[1],self.xb3[1],self.xb4[1],self.xb5[1],0] # The last digit is palm, currently not available
-
-    def get_thumb_matrix(self):
-        self.send_command(0xb1,[0xc6],sleep=0.005)
-        return self.thumb_matrix
-    
-    def get_index_matrix(self):
-        self.send_command(0xb2,[0xc6],sleep=0.005)
-        return self.index_matrix
-    
-    def get_middle_matrix(self):
-        self.send_command(0xb3,[0xc6],sleep=0.005)
-        return self.middle_matrix
-    
-    def get_ring_matrix(self):
-        self.send_command(0xb4,[0xc6],sleep=0.005)
-        return self.ring_matrix
-    
-    def get_little_matrix(self):
-        self.send_command(0xb5,[0xc6],sleep=0.005)
-        return self.little_matrix
 
     def get_matrix_touch(self):
         self.send_command(0xb1,[0xc6],sleep=0.04)

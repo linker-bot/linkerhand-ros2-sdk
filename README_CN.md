@@ -115,6 +115,7 @@ effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 ## 版本更新
 - > ### release_2.2.1
  - 1、新增矩阵式压力传感器点阵热力示意图
+ - 2、新增O6 RS485通讯
 
 - > ### release_2.1.9
  - 1、支持O6/L6版本灵巧手
@@ -148,8 +149,8 @@ effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 &ensp;&ensp; __使用前请先将 [setting.yaml](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/linker_hand_ros2_sdk/LinkerHand/config/setting.yaml) 配置文件根据实际需求进行相应修改该.__
 
 
-## 通用
-- [gui_control(图形界面控制)](图形界面控制)
+## [示例]通用
+- [gui_control(图形界面控制与动作示例)](图形界面控制与动作示例)
 图形界面控制可以通过滑动块控制LinkerHand灵巧手L10、L20各个关节独立运动。也可以通过添加按钮记录当前所有滑动块的数值，保存LinkerHand灵巧手当前各个关节运动状态。通过功能性按钮进行动作复现。    
 
 使用gui_control控制LinkerHand灵巧手:
@@ -157,6 +158,9 @@ gui_control界面控制灵巧手需要启动linker_hand_sdk_ros，以topic的形
 开启ROS2 SDK后
 
 &ensp;&ensp; __使用前请先将 [gui_control.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/gui_control/launch/gui_control.launch.py)文件按照实际灵巧手参数进行配置.__
+
+<img  src="resource/gui.png" width="550">
+
 ```bash
 # 新开终端
 $ cd linker_hand_ros2_sdk/
@@ -165,10 +169,14 @@ $ ros2 launch gui_control gui_control.launch.py
 ```
 开启后会弹出UI界面。通过滑动条可控制相应LinkerHand灵巧手关节运动
 
-- [matrix_touch_gui(矩阵式压感热力示意图)]
+## [示例] [matrix_touch_gui(矩阵式压感热力示意图)]
 矩阵式压感热力示意图可以通过显示LinkerHand灵巧手各个关节的指尖矩阵压力传感器数据，并以热力图的形式展示。确认灵巧手配备矩阵式压力传感器后才可使用。
 开启ROS2 SDK后
 &ensp;&ensp; __使用前请先将 [matrix_touch_gui.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/matrix_touch_gui/launch/matrix_touch_gui.launch.py)文件按照实际灵巧手参数进行配置.__
+
+<img  src="resource/matrix_touch.png" width="550">
+
+
 ```bash
 # 新开终端
 $ cd linker_hand_ros2_sdk/

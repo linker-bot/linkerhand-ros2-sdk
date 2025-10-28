@@ -281,26 +281,6 @@ class LinkerHandO6Can:
         self.send_frame(0xb5,[],sleep=0.03)
         return [self.xb1[1],self.xb2[1],self.xb3[1],self.xb4[1],self.xb5[1],0] # The last digit is palm, currently not available
     
-    def get_thumb_matrix(self):
-        self.send_frame(0xb1,[0xc6],sleep=0.005)
-        return self.thumb_matrix
-    
-    def get_index_matrix(self):
-        self.send_frame(0xb2,[0xc6],sleep=0.005)
-        return self.index_matrix
-    
-    def get_middle_matrix(self):
-        self.send_frame(0xb3,[0xc6],sleep=0.005)
-        return self.middle_matrix
-    
-    def get_ring_matrix(self):
-        self.send_frame(0xb4,[0xc6],sleep=0.005)
-        return self.ring_matrix
-    
-    def get_little_matrix(self):
-        self.send_frame(0xb5,[0xc6],sleep=0.005)
-        return self.little_matrix
-
     def get_matrix_touch(self):
         self.send_frame(0xb1,[0xc6],sleep=0.01)
         self.send_frame(0xb2,[0xc6],sleep=0.01)
