@@ -27,12 +27,15 @@ class LinkerHand(Node):
         self.declare_parameter('hand_joint', 'L6')
         self.declare_parameter('is_touch', False)
         self.declare_parameter('can', 'can0')
-        
+        self.declare_parameter('modbus', "None")        
+
+
         # 获取参数值
         self.hand_type = self.get_parameter('hand_type').value
         self.hand_joint = self.get_parameter('hand_joint').value
         self.is_touch = self.get_parameter('is_touch').value
         self.can = self.get_parameter('can').value
+        self.modbus = self.get_parameter('modbus').value
         self.last_left_hand_move_pose = []
         self.last_right_hand_move_pose = []
         self.vel = []
@@ -77,7 +80,7 @@ class LinkerHand(Node):
 
     def init_hand(self,hand_type):
         if hand_type == "left":
-            self.api = LinkerHandApi(hand_type=hand_type, hand_joint=self.hand_joint,can=self.can)
+            self.api = LinkerHandApi(hand_type=hand_type, hand_joint=self.hand_joint,modbus=self.modbus,can=self.can)
             self.open_can.open_can(self.can)
             time.sleep(0.1)
             self.touch_type = self.api.get_touch_type()

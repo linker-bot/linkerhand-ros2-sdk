@@ -67,6 +67,21 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  left L10 set maximum torque to [200, 200, 200, 200, 200]
 ```
 
+## RS485 协议切换 当前支持O6，其他型号灵巧手请参考MODBUS RS485协议文档
+
+编辑config/setting.yaml配置文件，按照配置文件内注释说明进行参数修改,将MODBUS:"/dev/ttyUSB0"，并且[linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)配置文件中"modbus"参数为"/dev/ttyUSB0"。USB-RS485转换器在Ubuntu上一般显示为/dev/ttyUSB* or /dev/ttyACM*
+modbus: "None" or "/dev/ttyUSB0"
+```bash
+# 确保requirements.txt安装依赖
+# 安装系统级相关驱动
+$ pip install minimalmodbus --break-system-packages
+$ pip install pyserial --break-system-packages
+# 查看USB-RS485端口号
+$ ls /dev
+# 可以看到类似ttyUSB0端口后给端口执行权限
+$ sudo chmod 777 /dev/ttyUSB0
+```
+
 - position与手指关节对照表
 ```bash
 $ ros2 topic echo /cb_left_hand_control_cmd --flow-style
@@ -113,6 +128,9 @@ effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
   L25: ["大拇指根部", "食指根部", "中指根部","无名指根部","小拇指根部","大拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小拇指侧摆","大拇指横滚","预留","预留","预留","预留","大拇指中部","食指中部","中指中部","无名指中部","小拇指中部","大拇指指尖","食指指尖","中指指尖","无名指指尖","小拇指指尖"]
 
 ## 版本更新
+- > ### release_2.2.3
+ - 1、gui图形控制新增速度、扭矩实时控制
+
 - > ### release_2.2.1
  - 1、新增矩阵式压力传感器点阵热力示意图
  - 2、新增O6 RS485通讯
@@ -168,6 +186,28 @@ $ source ./install/setup.bash
 $ ros2 launch gui_control gui_control.launch.py
 ```
 开启后会弹出UI界面。通过滑动条可控制相应LinkerHand灵巧手关节运动
+
+- 增加或修改动作示例。在[constants.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/gui_control/gui_control/config/constants.py)文件中可增加或修改动作。
+```python
+# 例如增加L6的动作序列
+"L6": HandConfig(
+        joint_names_en=["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
+        joint_names=["大拇指弯曲", "大拇指横摆", "食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
+        init_pos=[250] * 6,
+        preset_actions={
+            "张开": [250, 250, 250, 250, 250, 250],
+            "壹": [0, 31, 255, 0, 0, 0],
+            "贰": [0, 31, 255, 255, 0, 0],
+            "叁": [0, 30, 255, 255, 255, 0], 
+            "肆": [0, 30, 255, 255, 255, 255],
+            "伍": [250, 250, 250, 250, 250, 250],
+            "OK": [54, 41, 164, 250, 250, 250],
+            "点赞": [255, 31, 0, 0, 0, 0],
+            "握拳": [49, 61, 0, 0, 0, 0],
+            # 增加自定义动作......
+        }
+    )
+```
 
 ## [示例] [matrix_touch_gui(矩阵式压感热力示意图)]
 矩阵式压感热力示意图可以通过显示LinkerHand灵巧手各个关节的指尖矩阵压力传感器数据，并以热力图的形式展示。确认灵巧手配备矩阵式压力传感器后才可使用。

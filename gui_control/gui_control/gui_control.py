@@ -1,5 +1,5 @@
 import sys
-import time
+import time, json
 import threading
 from dataclasses import dataclass
 from typing import List, Dict
@@ -17,133 +17,7 @@ from PyQt5.QtGui import QFont
 
 from .utils.mapping import *
 
-# 配置和常量定义
-@dataclass
-class HandConfig:
-    """手部配置数据类"""
-    joint_names: List[str] = None
-    joint_names_en: List[str] = None
-    init_pos: List[int] = None
-    preset_actions: Dict[str, List[int]] = None
-
-    @classmethod
-    def from_hand_type(cls, hand_type: str) -> 'HandConfig':
-        """根据手部类型创建配置"""
-        hand_configs = {
-            "L25": cls(
-                joint_names=["大拇指根部","食指根部","中指根部","无名指根部","小拇指根部",
-                            "大拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小拇指侧摆",
-                            "大拇指横滚","预留","预留","预留","预留","大拇指中部","食指中部",
-                            "中指中部","无名指中部","小拇指中部","大拇指指尖","食指指尖",
-                            "中指指尖","无名指指尖","小拇指指尖"],
-                init_pos=[255] * 25,
-                preset_actions={
-                    "握拳": [0]*25,
-                    "张开": [255]*25,
-                    "OK": [255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 
-                           255, 255, 255, 255, 255, 255, 0, 0, 255, 255, 
-                           0, 0, 0, 255, 255]
-                }
-            ),
-            "L21": cls(
-                joint_names=["大拇指根部","食指根部","中指根部","无名指根部","小拇指根部",
-                            "大拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小拇指侧摆",
-                            "大拇指横滚","预留","预留","预留","预留","大拇指中部","预留",
-                            "预留","预留","预留","大拇指指尖","食指指尖","中指指尖",
-                            "无名指指尖","小拇指指尖"],
-                init_pos=[255] * 25
-            ),
-            "L20": cls(
-                joint_names=["拇指根部", "食指根部", "中指根部", "无名指根部","小指根部",
-                            "拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小指侧摆",
-                            "拇指横摆","预留","预留","预留","预留","拇指尖部","食指末端",
-                            "中指末端","无名指末端","小指末端"],
-                init_pos=[255,255,255,255,255,255,10,100,180,240,245,255,255,255,255,255,255,255,255,255],
-                preset_actions = {
-                    "握拳": [40, 0, 0, 0, 0, 131, 10, 100, 180, 240, 19, 255, 255, 255, 255, 135, 0, 0, 0, 0],
-                    "张开": [255, 255, 255, 255, 255, 255, 10, 100, 180, 240, 245, 255, 255, 255, 255, 255, 255, 255, 255, 255],
-                    "OK": [191, 95, 255, 255, 255, 136, 107, 100, 180, 240, 72, 255, 255, 255, 255, 116, 99, 255, 255, 255],
-                    "点赞": [255, 0, 0, 0, 0, 127, 10, 100, 180, 240, 255, 255, 255, 255, 255, 255, 0, 0, 0, 0]
-                }
-            ),
-            "L10": cls(
-                joint_names_en =["thumb_cmc_pitch", "thumb_cmc_roll","index_mcp_pitch","middle_mcp_pitch","ring_mcp_pitch","pinky_mcp_pitch","index_mcp_roll","ring_mcp_roll","pinky_mcp_roll","thumb_cmc_yaw"],
-                joint_names=["拇指根部", "拇指侧摆","食指根部", "中指根部", "无名指根部", 
-                            "小指根部","食指侧摆","无名指侧摆","小指侧摆","拇指旋转"],
-                init_pos=[255] * 10,
-                preset_actions={
-                    "握拳": [75, 128, 0, 0, 0, 0, 128, 128, 128, 57],
-                    "张开": [255, 128, 255, 255, 255, 255, 128, 128, 128, 128],
-                    "OK": [110, 128, 75, 255, 255, 255, 128, 128, 128, 68],
-                    "点赞": [255, 145, 0, 0, 0, 0, 0, 255, 255, 65]
-                }
-            ),
-            "L7": cls(
-                joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", 
-                            "小拇指弯曲","拇指旋转"],
-                init_pos=[250] * 7,
-                preset_actions={
-                    "握拳": [71, 79, 0, 0, 0, 0, 64],
-                    "张开": [255, 111, 250, 250, 250, 250, 55],
-                    "OK": [141, 111, 168, 250, 250, 250, 86],
-                    "点赞": [255, 111, 0, 0, 0, 0, 86]
-                }
-            ),
-            "O6": cls(
-                # [103, 102, 111, 250, 250, 250] 对指
-                joint_names_en = ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
-                joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
-                init_pos=[250] * 6,
-                preset_actions={
-                    
-                    "张开": [250, 250, 250, 250, 250, 250],
-                    "壹": [125, 18, 255, 0, 0, 0],
-                    "贰": [92, 87, 255, 255, 0, 0],
-                    "叁": [92, 87, 255, 255, 255, 0],
-                    "肆": [92, 87, 255, 255, 255, 255],
-                    "伍": [255, 255, 255, 255, 255, 255],
-                    "OK": [96, 100, 118, 250, 250, 250],
-                    "点赞": [250, 79, 0, 0, 0, 0],
-                    "握拳": [102, 18, 0, 0, 0, 0],
-                    
-                }
-            ),
-            "L6": cls(
-                joint_names_en = ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
-                joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
-                init_pos=[250] * 6,
-                preset_actions={
-                    
-                    "张开": [250, 250, 250, 250, 250, 250],
-                    "壹": [125, 18, 255, 0, 0, 0],
-                    "贰": [92, 87, 255, 255, 0, 0],
-                    "叁": [92, 87, 255, 255, 255, 0],
-                    "肆": [92, 87, 255, 255, 255, 255],
-                    "伍": [255, 255, 255, 255, 255, 255],
-                    "OK": [96, 100, 118, 250, 250, 250],
-                    "点赞": [250, 79, 0, 0, 0, 0],
-                    "握拳": [102, 18, 0, 0, 0, 0],
-                    
-                }
-            ),
-            "L6P": cls(
-                joint_names_en = ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "pinky_mcp_pitch", "ring_mcp_pitch"],
-                joint_names=["大拇指弯曲", "大拇指横摆","食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲"],
-                init_pos=[250] * 6,
-                preset_actions={
-                    "张开": [250, 250, 250, 250, 250, 250],
-                    "壹": [0, 31, 255, 0, 0, 0],
-                    "贰": [0, 31, 255, 255, 0, 0],
-                    "叁": [0, 30, 255, 255, 255, 0],
-                    "肆": [0, 30, 255, 255, 255, 255],
-                    "伍": [250, 250, 250, 250, 250, 250],
-                    "OK": [54, 41, 164, 250, 250, 250],
-                    "点赞": [255, 31, 0, 0, 0, 0],
-                    "握拳": [49, 61, 0, 0, 0, 0],
-                }
-            ),
-        }
-        return hand_configs.get(hand_type.upper(), hand_configs["L10"])
+from .config.constants import _HAND_CONFIGS
 
 class ROS2NodeManager(QObject):
     """ROS2节点管理器，处理ROS通信"""
@@ -187,7 +61,11 @@ class ROS2NodeManager(QObject):
             self.publisher = self.node.create_publisher(
                 JointState, f'/cb_{self.hand_type}_hand_control_cmd', 10
             )
-            
+                    # 新增 speed / torque 发布者
+            self.speed_pub = self.node.create_publisher(
+                String, f'/cb_hand_setting_cmd', 10)
+            self.torque_pub = self.node.create_publisher(
+                String, f'/cb_hand_setting_cmd', 10)
             self.status_updated.emit("info", f"ROS2节点初始化成功: {self.hand_type} {self.hand_joint}")
             
             # 启动ROS2自旋线程
@@ -214,7 +92,8 @@ class ROS2NodeManager(QObject):
             # self.joint_state.velocity = [0.1] * len(positions)
             # self.joint_state.effort = [0.01] * len(positions)
             # 如果有关节名称，添加到消息中
-            hand_config = HandConfig.from_hand_type(self.hand_joint)
+            #hand_config = HandConfig.from_hand_type(self.hand_joint)
+            hand_config = _HAND_CONFIGS[self.hand_joint]
             if len(hand_config.joint_names) == len(positions):
                 if hand_config.joint_names_en != None:
                     self.joint_state.name = hand_config.joint_names_en
@@ -251,6 +130,47 @@ class ROS2NodeManager(QObject):
         except Exception as e:
             self.status_updated.emit("error", f"发布失败: {str(e)}")
 
+    def publish_speed(self, val: int):
+        joint_len = 0
+        if (self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6"):
+            joint_len = 6
+        elif self.hand_joint == "L7":
+            joint_len = 7
+        elif self.hand_joint == "L10":
+            joint_len = 10
+        else:
+            joint_len = 5
+        msg = String()
+        v = [val] * joint_len
+        data = {
+            "setting_cmd": "set_speed",
+            "params": {"hand_type":self.hand_type,"speed": v},
+        }
+        msg.data = json.dumps(data)
+        print(f"速度值：{v}", flush=True)
+        self.speed_pub.publish(msg)
+
+    def publish_torque(self, val: int):
+        joint_len = 0
+        if (self.hand_joint.upper() == "O6" or self.hand_joint.upper() == "L6"):
+            joint_len = 6
+        elif self.hand_joint == "L7":
+            joint_len = 7
+        elif self.hand_joint == "L10":
+            joint_len = 10
+        else:
+            joint_len = 5
+        msg = String()
+        v = [val] * joint_len
+        data = {
+            "setting_cmd": "set_max_torque_limits",
+            "params": {"hand_type":self.hand_type,"torque": v},
+        }
+        
+        msg.data = json.dumps(data)
+        print(f"扭矩值：{v}", flush=True)
+        self.torque_pub.publish(msg)
+
     def shutdown(self):
         """关闭ROS2节点"""
         if self.node:
@@ -277,7 +197,7 @@ class HandControlGUI(QWidget):
         # 获取手部配置
         self.hand_joint = self.ros_manager.hand_joint
         self.hand_type = self.ros_manager.hand_type
-        self.hand_config = HandConfig.from_hand_type(self.hand_joint)
+        self.hand_config = _HAND_CONFIGS[self.hand_joint]
         
         # 初始化UI
         self.init_ui()
@@ -540,26 +460,74 @@ class HandControlGUI(QWidget):
                 parent_layout.addWidget(button, row, col)
 
     def create_status_monitor_panel(self):
-        """创建状态监控面板"""
+        """创建状态监控面板（速度/扭矩各占一行，并实时显示滑块值）"""
         panel = QWidget()
         layout = QVBoxLayout(panel)
-        
-        # 创建标题
+
+        # —— 1. 标题 ——
         title_label = QLabel("状态监控")
         title_label.setFont(QFont("Microsoft YaHei", 14, QFont.Bold))
         layout.addWidget(title_label)
-        
-        # 创建标签页
+
+        # —— 2. 新增：速度与扭矩设置（每行一个）——
+        quick_set_gb = QGroupBox("快速设置")
+        qv_layout = QVBoxLayout(quick_set_gb)
+
+        # 速度行
+        speed_hbox = QHBoxLayout()
+        speed_hbox.addWidget(QLabel("速度:"))
+        self.speed_slider = QSlider(Qt.Horizontal)
+        self.speed_slider.setRange(0, 255)
+        self.speed_slider.setValue(255)
+        self.speed_slider.setMinimumWidth(150)
+        speed_hbox.addWidget(self.speed_slider)
+        self.speed_val_lbl = QLabel("255")          # 实时值
+        self.speed_val_lbl.setMinimumWidth(30)
+        speed_hbox.addWidget(self.speed_val_lbl)
+        self.speed_btn = QPushButton("设置速度")
+        self.speed_btn.clicked.connect(
+            lambda: (
+                self.ros_manager.publish_speed(self.speed_slider.value()),
+                self.status_updated.emit(
+                    "info", f"速度已设为 {self.speed_slider.value()}")
+            ))
+        speed_hbox.addWidget(self.speed_btn)
+        speed_hbox.addStretch()
+        qv_layout.addLayout(speed_hbox)
+
+        # 扭矩行
+        torque_hbox = QHBoxLayout()
+        torque_hbox.addWidget(QLabel("扭矩:"))
+        self.torque_slider = QSlider(Qt.Horizontal)
+        self.torque_slider.setRange(0, 255)
+        self.torque_slider.setValue(255)
+        self.torque_slider.setMinimumWidth(150)
+        torque_hbox.addWidget(self.torque_slider)
+        self.torque_val_lbl = QLabel("255")
+        self.torque_val_lbl.setMinimumWidth(30)
+        torque_hbox.addWidget(self.torque_val_lbl)
+        self.torque_btn = QPushButton("设置扭矩")
+        self.torque_btn.clicked.connect(
+            lambda: (
+                self.ros_manager.publish_torque(self.torque_slider.value()),
+                self.status_updated.emit(
+                    "info", f"扭矩已设为 {self.torque_slider.value()}")
+            ))
+        torque_hbox.addWidget(self.torque_btn)
+        torque_hbox.addStretch()
+        qv_layout.addLayout(torque_hbox)
+
+        layout.addWidget(quick_set_gb)
+
+        # —— 3. 原有标签页部分，完全不动 ——
         tab_widget = QTabWidget()
-        
+
         # 系统信息标签页
         sys_info_widget = QWidget()
         sys_info_layout = QVBoxLayout(sys_info_widget)
-        
-        # 连接状态
+
         conn_group = QGroupBox("连接状态")
         conn_layout = QVBoxLayout(conn_group)
-        
         if self.ros_manager.publisher.get_subscription_count() > 0:
             self.connection_status = QLabel("ROS2节点已连接")
             self.connection_status.setObjectName("StatusLabel")
@@ -568,13 +536,10 @@ class HandControlGUI(QWidget):
             self.connection_status = QLabel("ROS2节点未连接")
             self.connection_status.setObjectName("StatusLabel")
             self.connection_status.setObjectName("StatusError")
-            
         conn_layout.addWidget(self.connection_status)
-        
-        # 手部信息
+
         hand_info_group = QGroupBox("手部信息")
         hand_info_layout = QVBoxLayout(hand_info_group)
-        
         info_text = f"""手部类型: {self.hand_type}
 关节型号: {self.hand_joint}
 关节数量: {len(self.hand_config.joint_names)}
@@ -582,34 +547,33 @@ class HandControlGUI(QWidget):
         self.hand_info_label = QLabel(info_text)
         self.hand_info_label.setWordWrap(True)
         hand_info_layout.addWidget(self.hand_info_label)
-        
+
         sys_info_layout.addWidget(conn_group)
         sys_info_layout.addWidget(hand_info_group)
         sys_info_layout.addStretch()
-        
         tab_widget.addTab(sys_info_widget, "系统信息")
-        
+
         # 状态日志标签页
         log_widget = QWidget()
         log_layout = QVBoxLayout(log_widget)
-        
         self.status_log = QLabel("等待系统启动...")
         self.status_log.setObjectName("StatusLabel")
         self.status_log.setObjectName("StatusInfo")
         self.status_log.setWordWrap(True)
         self.status_log.setMinimumHeight(300)
-        
         log_layout.addWidget(self.status_log)
-        
-        # 清除日志按钮
         clear_log_btn = QPushButton("清除日志")
         clear_log_btn.clicked.connect(self.clear_status_log)
         log_layout.addWidget(clear_log_btn)
-        
         tab_widget.addTab(log_widget, "状态日志")
-        
+
         layout.addWidget(tab_widget)
-        
+
+        # —— 4. 实时更新滑块值 ——
+        self.speed_slider.valueChanged.connect(
+            lambda v: self.speed_val_lbl.setText(str(v)))
+        self.torque_slider.valueChanged.connect(
+            lambda v: self.torque_val_lbl.setText(str(v)))
         return panel
 
     def create_value_display_panel(self):
@@ -748,7 +712,7 @@ class HandControlGUI(QWidget):
     def on_joint_type_changed(self, joint_type: str):
         """关节类型改变事件处理"""
         self.hand_joint = joint_type
-        self.hand_config = HandConfig.from_hand_type(joint_type)
+        self.hand_config = _HAND_CONFIGS[self.hand_joint]
         
         # 更新手部信息
         info_text = f"""手部类型: {self.hand_type}

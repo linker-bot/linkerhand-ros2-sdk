@@ -115,16 +115,6 @@ class LinkerHandO6RS485:
     # ----------------------------------------------------------
     # 底层读写封装
     # ----------------------------------------------------------
-    # def _read_reg(self, addr: int) -> int:
-    #     """读单个输入寄存器（功能码 04）"""
-    #     return self.instr.read_register(addr, functioncode=4)
-
-    # def _write_reg(self, addr: int, value: int):
-    #     """写单个保持寄存器（功能码 16）"""
-    #     if not 0 <= value <= 255:
-    #         raise ValueError("value must be 0-255")
-    #     self.instr.write_register(addr, value, functioncode=16)
-
     def _bus_free(self):
         """保证距离上一帧 ≥ 30 ms"""
         elapse = time.perf_counter() - self._last_ts
@@ -222,6 +212,7 @@ class LinkerHandO6RS485:
     # 固定函数
     # ----------------------------------------------------------
     def is_valid_6xuint8(self, lst) -> bool:
+        lst = [int(x) for x in lst]
         return (
             isinstance(lst, list) and
             len(lst) == 6 and

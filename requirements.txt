@@ -1,4 +1,6 @@
 python-can
+minimalmodbus 
+pyserial
 dm_env
 pexpect
 pyquaternion
