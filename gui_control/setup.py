@@ -14,7 +14,7 @@ setup(
         (os.path.join('share', 'gui_control', 'launch'), glob('launch/*.launch.py')),
         ('share/' + package_name, ['package.xml']),
     ],
-    install_requires=['setuptools', 'linker_hand_ros2_sdk'],
+    install_requires=['setuptools'],
     zip_safe=True,
     maintainer='linker-robot',
     maintainer_email='linker-robot@todo.todo',
