@@ -213,6 +213,22 @@ class LinkerHandApi:
     
     def get_matrix_touch_v2(self):
         return self.hand.get_matrix_touch_v2()
+    
+
+    def get_thumb_matrix_touch(self):
+        return self.hand.get_thumb_matrix_touch()
+    
+    def get_index_matrix_touch(self):
+        return self.hand.get_index_matrix_touch()
+    
+    def get_middle_matrix_touch(self):
+        return self.hand.get_middle_matrix_touch()
+    
+    def get_ring_matrix_touch(self):
+        return self.hand.get_ring_matrix_touch()
+    
+    def get_little_matrix_touch(self):
+        return self.hand.get_little_matrix_touch()
 
     def get_torque(self):
         '''Get current maximum torque'''

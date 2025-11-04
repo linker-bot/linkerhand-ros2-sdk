@@ -70,7 +70,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 ## RS485 协议切换 当前支持O6，其他型号灵巧手请参考MODBUS RS485协议文档
 
 编辑config/setting.yaml配置文件，按照配置文件内注释说明进行参数修改,将MODBUS:"/dev/ttyUSB0"，并且[linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)配置文件中"modbus"参数为"/dev/ttyUSB0"。USB-RS485转换器在Ubuntu上一般显示为/dev/ttyUSB* or /dev/ttyACM*
-modbus: "None" or "/dev/ttyUSB0"  注:modbus的参数为string类型
+modbus: "None" or "/dev/ttyUSB0"
 ```bash
 # 确保requirements.txt安装依赖
 # 安装系统级相关驱动
