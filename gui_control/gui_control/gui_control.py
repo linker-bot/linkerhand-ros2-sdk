@@ -14,7 +14,7 @@ import tkinter.font as tkfont
 
 from .utils.mapping import *
 from .config.constants import _HAND_CONFIGS
-
+LOOP_TIME = 1000 # 循环动作间隔时间 毫秒
 class ROS2NodeManager:
     """ROS2节点管理器，处理ROS通信"""
     
@@ -524,12 +524,50 @@ class HandControlGUI:
         """创建滑动条数值显示面板"""
         frame = ttk.LabelFrame(self.root, text="关节数值列表", style='Group.TLabelframe')
         
+        # 创建按钮框架（放在显示框上方）
+        button_frame = ttk.Frame(frame)
+        button_frame.pack(fill=tk.X, padx=10, pady=(10, 5))
+        
+        # 复制按钮 - 左对齐
+        copy_button = ttk.Button(button_frame, text="复制到剪切板", 
+                            command=self.copy_values_to_clipboard, width=10)
+        copy_button.pack(side=tk.LEFT)
+        
+        # 数值显示框
         self.value_display = scrolledtext.ScrolledText(frame, height=4, width=100)
-        self.value_display.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.value_display.pack(fill=tk.BOTH, expand=True, padx=10, pady=(0, 10))
         self.value_display.insert(tk.END, "[]")
         self.value_display.config(state=tk.DISABLED)
         
         return frame
+
+    def copy_values_to_clipboard(self):
+        """复制关节数值到系统剪切板"""
+        try:
+            # 获取当前按钮引用
+            button = self.root.focus_get()
+            original_text = "复制到剪切板"
+            
+            # 获取文本框内容
+            content = self.value_display.get(1.0, tk.END).strip()
+            
+            # 清除文本框的选中状态
+            self.value_display.tag_remove(tk.SEL, "1.0", tk.END)
+            
+            # 复制到剪切板
+            self.root.clipboard_clear()
+            self.root.clipboard_append(content)
+            
+            # 改变按钮文本提示复制成功
+            if isinstance(button, ttk.Button):
+                button.config(text="已复制!")
+                # 1.5秒后恢复原文本
+                self.root.after(1500, lambda: button.config(text=original_text))
+            
+            self.update_status("info", f"关节数值已复制到剪切板")
+            
+        except Exception as e:
+            self.update_status("error", f"复制失败: {str(e)}")
 
     def on_slider_value_changed(self, index: int, value: str):
         """滑动条值改变事件处理"""
@@ -648,7 +686,7 @@ class HandControlGUI:
         self.update_status("info", f"运行预设动作: {action_name}")
         
         # 设置下一个动作定时器
-        self.cycle_timer = self.root.after(2000, self.run_next_action)
+        self.cycle_timer = self.root.after(LOOP_TIME, self.run_next_action)
 
     def reset_preset_buttons_color(self):
         """重置所有预设按钮颜色"""
