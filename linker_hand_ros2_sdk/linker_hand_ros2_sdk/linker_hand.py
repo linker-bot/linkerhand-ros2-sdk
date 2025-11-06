@@ -85,7 +85,7 @@ class LinkerHand(Node):
             time.sleep(0.1)
             self.touch_type = self.api.get_touch_type()
             self.hand_cmd_sub = self.create_subscription(JointState, '/cb_left_hand_control_cmd', self.left_hand_control_cb,10)
-            self.hand_cmd_arc_sub = self.create_subscription(JointState, '/cb_left_hand_control_cmd_arc', self.left_hand_control_arc_cb,10)
+            #self.hand_cmd_arc_sub = self.create_subscription(JointState, '/cb_left_hand_control_cmd_arc', self.left_hand_control_arc_cb,10)
             self.hand_state_pub = self.create_publisher(JointState, '/cb_left_hand_state',10)
             self.hand_state_arc_pub = self.create_publisher(JointState, '/cb_left_hand_state_arc',10)
             self.hand_info_pub = self.create_publisher(String, '/cb_left_hand_info', 10)
@@ -104,7 +104,7 @@ class LinkerHand(Node):
             time.sleep(0.1)
             self.touch_type = self.api.get_touch_type()
             self.hand_cmd_sub = self.create_subscription(JointState, '/cb_right_hand_control_cmd', self.right_hand_control_cb,10)
-            self.hand_cmd_arc_sub = self.create_subscription(JointState, '/cb_right_hand_control_cmd_arc', self.right_hand_control_arc_cb,10)
+            #self.hand_cmd_arc_sub = self.create_subscription(JointState, '/cb_right_hand_control_cmd_arc', self.right_hand_control_arc_cb,10)
             self.hand_state_pub = self.create_publisher(JointState, '/cb_right_hand_state',10)
             self.hand_state_arc_pub = self.create_publisher(JointState, '/cb_right_hand_state_arc',10)
             self.hand_info_pub = self.create_publisher(String, '/cb_right_hand_info', 10)
@@ -136,6 +136,8 @@ class LinkerHand(Node):
             speed = [200, 250, 250, 250, 250, 250, 250, 250, 250, 250]
         elif self.hand_joint == "L20":
             pose = [255,255,255,255,255,255,10,100,180,240,245,255,255,255,255,255,255,255,255,255]
+        elif self.hand_joint == "G20":
+            pose = [241, 255, 255, 255, 255, 255, 141, 134, 149, 137, 245, 255, 255, 255, 255, 255, 255, 255, 255, 255]
         elif self.hand_joint == "L21":
             pose = [75, 255, 255, 255, 255, 176, 97, 81, 114, 147, 202, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255]
         elif self.hand_joint == "L25":

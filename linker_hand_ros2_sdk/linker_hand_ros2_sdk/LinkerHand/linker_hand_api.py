@@ -37,6 +37,9 @@ class LinkerHandApi:
         if self.hand_joint == "L20":
             from core.can.linker_hand_l20_can import LinkerHandL20Can
             self.hand = LinkerHandL20Can(can_id=self.hand_id,can_channel=self.can, yaml=self.yaml)
+        if self.hand_joint == "G20":
+            from core.can.linker_hand_g20_can import LinkerHandG20Can
+            self.hand = LinkerHandG20Can(can_id=self.hand_id,can_channel=self.can, yaml=self.yaml)
         if self.hand_joint == "L21":
             from core.can.linker_hand_l21_can import LinkerHandL21Can
             self.hand = LinkerHandL21Can(can_id=self.hand_id,can_channel=self.can, yaml=self.yaml)
@@ -76,6 +79,8 @@ class LinkerHandApi:
         elif self.hand_joint == "L10" and len(pose) == 10:
             self.hand.set_joint_positions(pose)
         elif self.hand_joint == "L20" and len(pose) == 20:
+            self.hand.set_joint_positions(pose)
+        elif self.hand_joint == "G20" and len(pose) == 20:
             self.hand.set_joint_positions(pose)
         elif self.hand_joint == "L21" and len(pose) == 25:
             self.hand.set_joint_positions(pose)
@@ -184,6 +189,8 @@ class LinkerHandApi:
         elif self.hand_joint == "L10":
             speed = self.hand.get_speed()
             return speed
+        elif self.hand_joint == "G20":
+            return self.hand.get_speed()
         elif self.hand_joint == "L20":
             speed = self.hand.get_speed()
             return [255, speed[1], speed[2], speed[3], speed[4], 255, 255, 255, 255, 255, speed[0], 255, 255, 255, 255, 255, 255, 255, 255, 255]
@@ -265,7 +272,7 @@ class LinkerHandApi:
 
     def get_finger_order(self):
         '''Get finger motor order'''
-        if self.hand_joint == "L21" or self.hand_joint == "L25":
+        if self.hand_joint == "L21" or self.hand_joint == "L25" or self.hand_joint == "G20":
             return self.hand.get_finger_order()
         else:
             return []

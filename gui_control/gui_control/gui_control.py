@@ -669,7 +669,7 @@ class HandControlGUI(QWidget):
             self.current_action_index = -1  # 重置索引
             self.cycle_timer = QTimer(self)
             self.cycle_timer.timeout.connect(self.run_next_action)
-            self.cycle_timer.start(LOOP_TIME)  # 间隔
+            self.cycle_timer.start(LOOP_TIME)  # 2秒间隔
             self.cycle_button.setText("停止循环运行")
             self.status_updated.emit("info", "开始循环运行预设动作")
             self.run_next_action()  # 立即运行第一个动作
