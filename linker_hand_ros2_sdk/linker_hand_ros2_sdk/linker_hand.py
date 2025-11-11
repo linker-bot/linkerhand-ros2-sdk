@@ -99,7 +99,7 @@ class LinkerHand(Node):
                 else:
                     ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Not equipped with any pressure sensors", color="red")
         elif hand_type == "right":
-            self.api = LinkerHandApi(hand_type=hand_type, hand_joint=self.hand_joint,can=self.can)
+            self.api = LinkerHandApi(hand_type=hand_type, hand_joint=self.hand_joint,modbus=self.modbus,can=self.can)
             self.open_can.open_can(self.can)
             time.sleep(0.1)
             self.touch_type = self.api.get_touch_type()
