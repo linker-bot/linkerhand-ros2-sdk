@@ -15,7 +15,7 @@ def generate_launch_description():
                 'hand_joint': "L10", # O6\L6P\L6\L7\L10\L20\G20(工业版)\L21 字母为大写
                 'is_touch': True, # 配置Linker Hand灵巧手是否有压力传感器 True | False
                 'can': 'can0', # 这里需要修改为实际的CAN总线名称 如果是win系统则类似于 PCAN_USBBUS1
-                "modbus": "/dev/ttyUSB0" # "None" | "/dev/ttyUSB0" 这里需要修改为实际的Modbus总线名称 如果是win系统则 COM* Ubuntu则为/dev/ttyUSB* 注意添加sudo chmod 777 /dev/ttyUSB*权限
+                "modbus": "None" # "None" | "/dev/ttyUSB0" 这里需要修改为实际的Modbus总线名称 如果是win系统则 COM* Ubuntu则为/dev/ttyUSB* 注意添加sudo chmod 777 /dev/ttyUSB*权限
             }],
         ),
     ])
