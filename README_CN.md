@@ -67,7 +67,7 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  left L10 set maximum torque to [200, 200, 200, 200, 200]
 ```
 
-## RS485 协议切换 当前支持O6，其他型号灵巧手请参考MODBUS RS485协议文档
+## RS485 协议切换 当前支持O6/L6/L10，其他型号灵巧手请参考MODBUS RS485协议文档
 
 编辑config/setting.yaml配置文件，按照配置文件内注释说明进行参数修改,将MODBUS:"/dev/ttyUSB0"，并且[linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)配置文件中"modbus"参数为"/dev/ttyUSB0"。USB-RS485转换器在Ubuntu上一般显示为/dev/ttyUSB* or /dev/ttyACM*
 modbus: "None" or "/dev/ttyUSB0"
@@ -76,6 +76,7 @@ modbus: "None" or "/dev/ttyUSB0"
 # 安装系统级相关驱动
 $ pip install minimalmodbus --break-system-packages
 $ pip install pyserial --break-system-packages
+$ pip install pymodbus --break-system-packages
 # 查看USB-RS485端口号
 $ ls /dev
 # 可以看到类似ttyUSB0端口后给端口执行权限

@@ -134,6 +134,7 @@ class LinkerHand(Node):
         elif self.hand_joint == "L10":
             pose = [255, 200, 255, 255, 255, 255, 180, 180, 180, 41]
             speed = [200, 250, 250, 250, 250, 250, 250, 250, 250, 250]
+            torque = [250] * 10
         elif self.hand_joint == "L20":
             pose = [255,255,255,255,255,255,10,100,180,240,245,255,255,255,255,255,255,255,255,255]
         elif self.hand_joint == "G20":
@@ -563,6 +564,9 @@ def main(args=None):
     embedded_version = node.embedded_version
     try:
         if len(embedded_version) == 3:
+            ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
+            node.run_v2()
+        elif len(embedded_version) == 6 and node.hand_joint == "L10":
             ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
             node.run_v2()
         elif len(embedded_version) > 4 and ((embedded_version[0]==10 and embedded_version[4]>35) or (embedded_version[0]==7 and embedded_version[4]>50) or (embedded_version[0] == 6)):

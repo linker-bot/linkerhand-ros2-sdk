@@ -1,5 +1,6 @@
 python-can
-minimalmodbus 
+minimalmodbus
+pymodbus
 pyserial
 dm_env
 pexpect
