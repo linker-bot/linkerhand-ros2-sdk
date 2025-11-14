@@ -563,7 +563,7 @@ def main(args=None):
     node = LinkerHand("linker_hand_sdk")
     embedded_version = node.embedded_version
     try:
-        if len(embedded_version) == 3:
+        if len(embedded_version) == 3 or linker_hand.hand_joint.upper() == "O6" or linker_hand.hand_joint.upper() == "L6" or linker_hand.hand_joint.upper() == "G20"::
             ColorMsg(msg=f"New Matrix Touch For SDK V2", color="green")
             node.run_v2()
         elif len(embedded_version) == 6 and node.hand_joint == "L10":
