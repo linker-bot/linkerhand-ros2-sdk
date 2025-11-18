@@ -11,7 +11,7 @@ import time
 from rclpy.node import Node                      # ROS2 节点类
 from std_msgs.msg import String, Header, Float32MultiArray
 from sensor_msgs.msg import JointState
-import time, json
+import time, json, threading
 from linker_hand_ros2_sdk.LinkerHand.linker_hand_api import LinkerHandApi
 from linker_hand_ros2_sdk.LinkerHand.utils.color_msg import ColorMsg
 from linker_hand_ros2_sdk.LinkerHand.utils.open_can import OpenCan
@@ -35,11 +35,12 @@ class LinkerHand(Node):
         self.can = self.get_parameter('can').value
         self.modbus = self.get_parameter('modbus').value
         self.cmd_lock = False
-        self.last_hand_post_cmd = None
-        self.last_hand_vel_cmd = None
-        self.last_hand_eff_cmd = None
-        self.version = []
-        self.touch_type = -1
+        self.last_hand_post_cmd = None # 最新手指位置命令
+        self.last_hand_vel_cmd = None # 最新手指速度命令
+        self.last_hand_eff_cmd = None # 最新手指力矩命令
+
+        self.last_hand_state = [-1] * 10
+        self.last_hand_vel = [-1] * 10
         self.matrix_dic = {
             "thumb_matrix":[[-1] * 12 for _ in range(6)],
             "index_matrix":[[-1] * 12 for _ in range(6)],
@@ -47,12 +48,30 @@ class LinkerHand(Node):
             "ring_matrix":[[-1] * 12 for _ in range(6)],
             "little_matrix":[[-1] * 12 for _ in range(6)]
         }
+        self.last_hand_info = {
+            "version": [-1], # Dexterous hand version number
+            "hand_joint": self.hand_joint, # Dexterous hand joint type
+            "speed": [-1] * 10, # Current speed threshold of the dexterous hand
+            "current": [-1] * 10, # Current of the dexterous hand
+            "fault": [-1] * 10, # Current fault of the dexterous hand
+            "motor_temperature": [-1] * 10, # Current motor temperature of the dexterous hand
+            "torque": [-1] * 10, # Current torque of the dexterous hand
+            "is_touch":self.is_touch,
+            "touch_type": -1,
+            "finger_order": None # Finger motor order
+        }
+        self.version = []
+        self.touch_type = -1
+        
 
         self.hand_setting_sub = self.create_subscription(String,'/cb_hand_setting_cmd', self.hand_setting_cb, 10)
         self._init_hand()
         time.sleep(1)
         self.run_count = 0 # 计数器，用于记录运行次数
         self.timer = self.create_timer(0.01, self.run)  # 100 Hz
+        self.thread_pub_state = threading.Thread(target=self.pub_state)
+        self.thread_pub_state.daemon = True
+        self.thread_pub_state.start()
 
     def _init_hand(self):
         self.api = LinkerHandApi(hand_type=self.hand_type, hand_joint=self.hand_joint,modbus=self.modbus,can=self.can)
@@ -120,7 +139,7 @@ class LinkerHand(Node):
 
     def run(self):
         if self.cmd_lock == False:
-            if self.run_count %  2 == 0:
+            if self.run_count % 2 == 0:
                 #print(f"{self.run_count}:接收CMD指令", flush=True)
                 # 先判断是否需要执行手指运动
                 if self.last_hand_post_cmd != None:
@@ -152,14 +171,13 @@ class LinkerHand(Node):
                             self.api.set_joint_speed(speed=speed)
                     self.last_hand_vel_cmd = None
                     time.sleep(0.005)
-            if self.run_count %  2 == 0 and self.hand_state_pub.get_subscription_count() > 0:
+            elif self.hand_state_pub.get_subscription_count() > 0:
                 # 获取手指状态并且发布
-                state = self.api.get_state()
-                speed = self.api.get_joint_speed()
-                msg = self.joint_state_msg(state, speed)
-                self.hand_state_pub.publish(msg)
-                #print(f"{self.run_count}:发布手指状态", flush=True)
-            if self.run_count % 4 == 0 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
+                self.last_hand_state = self.api.get_state()
+                time.sleep(0.003)
+                self.last_hand_vel = self.api.get_joint_speed()
+                time.sleep(0.003)
+            if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 force = self.api.get_force()
                 msg = Float32MultiArray()
@@ -168,35 +186,19 @@ class LinkerHand(Node):
             if self.is_touch == True and self.touch_type == 2 and self.matrix_touch_pub.get_subscription_count() > 0:
                 """矩阵式压力传感器"""
                 msg = String()
-                if self.run_count % 5 == 0:
+                if self.run_count == 3:
                     self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch().tolist()
-                    msg.data = json.dumps(self.matrix_dic)
-                    self.matrix_touch_pub.publish(msg)
-                    time.sleep(0.006)
-                    #print(f"{self.run_count}:获取到大拇指", flush=True)
-                if self.run_count % 7 == 0:
+                if self.run_count == 4:
                     self.matrix_dic["index_matrix"] = self.api.get_index_matrix_touch().tolist()
-                    time.sleep(0.006)
-                    #print(f"{self.run_count}:获取到食指", flush=True)
-                if self.run_count % 11 == 0:
+                if self.run_count == 5:
                     self.matrix_dic["middle_matrix"] = self.api.get_middle_matrix_touch().tolist()
-                    msg.data = json.dumps(self.matrix_dic)
-                    self.matrix_touch_pub.publish(msg)
-                    time.sleep(0.006)
-                    #print(f"{self.run_count}:获取到中指", flush=True)
-                if self.run_count % 13 == 0:
+                if self.run_count == 6:
                     self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch().tolist()
-                    time.sleep(0.006)
-                    #print(f"{self.run_count}:获取到无名指", flush=True)
-                if self.run_count % 17 == 0:
+                if self.run_count == 7:
                     self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch().tolist()
-                    msg.data = json.dumps(self.matrix_dic)
-                    self.matrix_touch_pub.publish(msg)
-                    time.sleep(0.006)
-                    #print(f"{self.run_count}:获取到小拇指", flush=True)
-            if self.run_count == 19 and self.hand_info_pub.get_subscription_count() > 0:
+            if self.run_count == 8 and self.hand_info_pub.get_subscription_count() > 0:
                 """手部信息"""
-                data = {
+                self.last_hand_info = {
                     "version": self.embedded_version, # Dexterous hand version number
                     "hand_joint": self.hand_joint, # Dexterous hand joint type
                     "speed": self.api.get_speed(), # Current speed threshold of the dexterous hand
@@ -208,18 +210,26 @@ class LinkerHand(Node):
                     "touch_type": self.touch_type,
                     "finger_order": self.api.get_finger_order() # Finger motor order
                 }
-                msg = String()
-                msg.data = json.dumps(data)
-                self.hand_info_pub.publish(msg)
-                #print(f"{self.run_count}:发布信息", flush=True)
-            if self.run_count == 20:
-                #print(f"{self.run_count}:重置计数器", flush=True)
+            if self.run_count == 9:
                 self.run_count = 0
             self.run_count += 1
             time.sleep(0.005)
 
 
-
+    def pub_state(self):
+        while True:
+            if self.hand_state_pub.get_subscription_count() > 0:
+                msg = self.joint_state_msg(self.last_hand_state, self.last_hand_vel)
+                self.hand_state_pub.publish(msg)
+            if self.is_touch == True and self.touch_type == 2 and self.matrix_touch_pub.get_subscription_count() > 0:
+                msg = String()
+                msg.data = json.dumps(self.matrix_dic)
+                self.matrix_touch_pub.publish(msg)
+            if self.hand_info_pub.get_subscription_count() > 0:
+                msg = String()
+                msg.data = json.dumps(self.last_hand_info)
+                self.hand_info_pub.publish(msg)
+            time.sleep(1/60)
 
     
 
@@ -291,7 +301,7 @@ class LinkerHand(Node):
 
 
     def close_can(self):
-        self.open_can.close_can(can=self.can)
+        self.api.open_can.close_can(can=self.can)
         sys.exit(0)
 
         
