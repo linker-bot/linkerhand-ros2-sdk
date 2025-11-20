@@ -218,10 +218,6 @@ class LinkerHand(Node):
             if self.hand_state_pub.get_subscription_count() > 0 or self.hand_state_arc_pub.get_subscription_count() > 0:
                 state = self.api.get_state()
                 vel = self.api.get_joint_speed()
-                # if self.embedded_version[0] == 6 and self.embedded_version[4] == 16:
-                #     hand_state['state'] = [state[0], state[5], state[1], state[2], state[3], state[4]]
-                #     hand_state['vel'] = [vel[0], vel[5], vel[1], vel[2], vel[3], vel[4]]
-                # else:
                 hand_state['state'] = state
                 hand_state['vel'] = vel
                 self.pub_hand_state(hand_state=hand_state)
@@ -448,7 +444,6 @@ class LinkerHand(Node):
         else:
             '''右手接收控制topic回调 for range'''
             self.api.finger_move(pose=pose)
-        self.api.finger_move(pose=list(msg.position))
         vel = list(msg.velocity)
         self.vel = vel
         if all(x == 0 for x in vel):
