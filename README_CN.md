@@ -1,8 +1,18 @@
+<img  src="resource/logo.png" width="800">
+
 # LinkerHand灵巧手ROS2 SDK
 
 ## 概述
-LinkerHand灵巧手ROS SDK 是灵心巧手(北京)科技有限公司开发，用于O6、L6、L7、O7、L10、L21等LinkerHand灵巧手的驱动软件和功能示例源码。可用于真机与仿真器使用。
+LinkerHand灵巧手ROS SDK 是灵心巧手(北京)科技有限公司开发，用于O6、L6、L7、O7、L10、L20、G20、L21等LinkerHand灵巧手的驱动软件和功能示例源码。可用于真机与仿真器使用。
 LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
+
+
+
+| Name | Version | Link |
+| --- | --- | --- |
+| Python SDK | ![SDK Version](https://img.shields.io/badge/SDK%20Version-V3.0.1-brightgreen?style=flat-square) ![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat-square&logo=python&logoColor=white) ![Windows 11](https://img.shields.io/badge/OS-Windows%2011-0078D4?style=flat-square&logo=windows&logoColor=white) ![Ubuntu 20.04+](https://img.shields.io/badge/OS-Ubuntu%2020.04%2B-E95420?style=flat-square&logo=ubuntu&logoColor=white) | [![GitHub 仓库](https://img.shields.io/badge/GitHub-grey?logo=github&style=flat-square)](https://github.com/linker-bot/linkerhand-python-sdk) |
+| ROS SDK | ![SDK Version](https://img.shields.io/badge/SDK%20Version-V3.0.1-brightgreen?style=flat-square) ![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue?style=flat-square&logo=python&logoColor=white) ![Ubuntu 20.04+](https://img.shields.io/badge/OS-Ubuntu%2020.04%2B-E95420?style=flat-square&logo=ubuntu&logoColor=white) ![ROS Noetic](https://img.shields.io/badge/ROS-Noetic-009624?style=flat-square&logo=ros) | [![GitHub 仓库](https://img.shields.io/badge/GitHub-grey?logo=github&style=flat-square)](https://github.com/linker-bot/linkerhand-ros-sdk) |
+| ROS2 SDK | ![SDK Version](https://img.shields.io/badge/SDK%20Version-V3.0.1-brightgreen?style=flat-square) ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python&logoColor=white) ![Ubuntu 24.04](https://img.shields.io/badge/OS-Ubuntu%2024.04-E95420?style=flat-square&logo=ubuntu&logoColor=white) ![ROS 2 Jazzy](https://img.shields.io/badge/ROS%202-Jazzy-00B3E6?style=flat-square&logo=ros) ![Windows 11](https://img.shields.io/badge/OS-Windows%2011-0078D4?style=flat-square&logo=windows&logoColor=white) | [![GitHub 仓库](https://img.shields.io/badge/GitHub-grey?logo=github&style=flat-square)](https://github.com/linker-bot/linkerhand-ros2-sdk) |
 
 ## 安装
 &ensp;&ensp;确保当前系统环境为Ubuntu20.04 ROS 2 Foxy Python3.8.20 及以上
@@ -29,8 +39,8 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 
 &ensp;&ensp; __使用前请先将单手[linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py) or 双手[linker_hand_double.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand_double.launch.py)文件按照实际灵巧手参数进行配置.__
 
-- 启动SDK单手&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:O6/L6/L7/L10/L20/L21/L25
-- 启动SDK双手&ensp;&ensp;&ensp;&ensp;先将左手linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上，一般被识别为can0。再将右手linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上，一般识别为can1.  支持型号:O6/L6/L7/L10/L20/L21/L25
+- 启动SDK单手&ensp;&ensp;&ensp;&ensp;将linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上  支持型号:O6/L6/L7/L10/L20/G20/L21/L25
+- 启动SDK双手&ensp;&ensp;&ensp;&ensp;先将左手linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上，一般被识别为can0。再将右手linker_hand灵巧手的USB转CAN设备插入Ubuntu设备上，一般识别为can1.  支持型号:O6/L6/L7/L10/L20/G20/L21/L25
 ```bash
   # 开启CAN端口
   $ sudo /usr/sbin/ip link set can0 up type can bitrate 1000000 #USB转CAN设备蓝色灯常亮状态
@@ -131,6 +141,10 @@ effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
   L25: ["大拇指根部", "食指根部", "中指根部","无名指根部","小拇指根部","大拇指侧摆","食指侧摆","中指侧摆","无名指侧摆","小拇指侧摆","大拇指横滚","预留","预留","预留","预留","大拇指中部","食指中部","中指中部","无名指中部","小拇指中部","大拇指指尖","食指指尖","中指指尖","无名指指尖","小拇指指尖"]
 
 ## 版本更新
+- > ### release_3.0.1
+ - 1、支持O6/L6/L10 RS485通讯 pymodbus模式
+ - 2、重构ROS2逻辑层，提升CAN通讯效率
+
 - > ### release_2.2.4
  - 1、新增G20工业版灵巧手CAN通讯支持
 
@@ -147,25 +161,7 @@ effort: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 - > ### release_2.1.8
  - 1、修复偶发撞帧问题
 
-- > ### release_2.1.7
- - 1、修复已知问题
- - 2、将[Mujoco和PyBullet仿真](https://github.com/linker-bot/linkerhand-sim)移到仿真仓库中，减少SDK体量
-
-- > ### release_2.1.6
-  - 1、支持双CAN控制双灵巧手
-  - 2、新增Mujoco仿真
-  - 3、新增Pybullet仿真
-
-- > ### release_1.0.3
-  - 1、支持L20/L25版本灵巧手
-
-- > ### release_1.0.2
-  - 1、支持L10/O10版本灵巧手
-  - 2、支持GUI控制L10/O10版本灵巧手
-  - 3、增加支持压力传感器的LinkerHand波形图显示传感器状态
-- > ### release_1.0.1
-  - 1、支持L7/O7版本灵巧手
-  - 2、支持GUI控制L7/O7版本灵巧手
+ - ...................
 
 
 ## [示例](examples/)

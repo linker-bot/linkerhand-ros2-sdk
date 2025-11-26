@@ -4,7 +4,7 @@ import can
 import time,sys
 import threading
 import numpy as np
-from tabulate import tabulate
+#from tabulate import tabulate
 from enum import Enum
 from utils.open_can import OpenCan
 from utils.color_msg import ColorMsg
@@ -157,15 +157,15 @@ class LinkerHandL10Can:
         self.send_frame(FrameProperty.REQUEST_DATA_RETURN, [])
     ''' -------------------Pressure Sensors---------------------- '''
     def get_normal_force(self):
-        self.send_frame(FrameProperty.HAND_NORMAL_FORCE,[],sleep=0.01)
+        self.send_frame(FrameProperty.HAND_NORMAL_FORCE,[],sleep=0.004)
 
     def get_tangential_force(self):
-        self.send_frame(FrameProperty.HAND_TANGENTIAL_FORCE,[],sleep=0.01)
+        self.send_frame(FrameProperty.HAND_TANGENTIAL_FORCE,[],sleep=0.004)
 
     def get_tangential_force_dir(self):
-        self.send_frame(FrameProperty.HAND_TANGENTIAL_FORCE_DIR,[],sleep=0.01)
+        self.send_frame(FrameProperty.HAND_TANGENTIAL_FORCE_DIR,[],sleep=0.004)
     def get_approach_inc(self):
-        self.send_frame(FrameProperty.HAND_APPROACH_INC,[],sleep=0.01)
+        self.send_frame(FrameProperty.HAND_APPROACH_INC,[],sleep=0.004)
     ''' -------------------Motor Temperature---------------------- '''
     def get_motor_temperature(self):
         self.send_frame(FrameProperty.MOTOR_TEMPERATURE_1,[],sleep=0.01)
@@ -367,24 +367,24 @@ class LinkerHandL10Can:
         self.send_frame(0xb5,[0xc6],sleep=0.005)
         return self.thumb_matrix , self.index_matrix , self.middle_matrix , self.ring_matrix , self.little_matrix
 
-    def get_thumb_matrix_touch(self):
-        self.send_frame(0xb1,[0xc6],sleep=0.005)
+    def get_thumb_matrix_touch(self,sleep_time=0.005):
+        self.send_frame(0xb1,[0xc6],sleep=sleep_time)
         return self.thumb_matrix
     
-    def get_index_matrix_touch(self):
-        self.send_frame(0xb2,[0xc6],sleep=0.005)
+    def get_index_matrix_touch(self,sleep_time=0.005):
+        self.send_frame(0xb2,[0xc6],sleep=sleep_time)
         return self.index_matrix
     
-    def get_middle_matrix_touch(self):
-        self.send_frame(0xb3,[0xc6],sleep=0.005)
+    def get_middle_matrix_touch(self,sleep_time=0.005):
+        self.send_frame(0xb3,[0xc6],sleep=sleep_time)
         return self.middle_matrix
     
-    def get_ring_matrix_touch(self):
-        self.send_frame(0xb4,[0xc6],sleep=0.005)
+    def get_ring_matrix_touch(self,sleep_time=0.005):
+        self.send_frame(0xb4,[0xc6],sleep=sleep_time)
         return self.ring_matrix
     
-    def get_little_matrix_touch(self):
-        self.send_frame(0xb5,[0xc6],sleep=0.005)
+    def get_little_matrix_touch(self,sleep_time=0.005):
+        self.send_frame(0xb5,[0xc6],sleep=sleep_time)
         return self.little_matrix
 
 
@@ -439,7 +439,7 @@ class LinkerHandL10Can:
         
         #return [data[0],data[1],data[2],chr(data[3]),f"V{data[4] >> 4}.{data[4] & 0x0F}",f"V{data[5] >> 4}.{data[5] & 0x0F}",data[6]]
         table = [[k, v] for k, v in result.items()]
-        print(tabulate(table, tablefmt="grid"), flush=True)
+        #print(tabulate(table, tablefmt="grid"), flush=True)
 
 
     # # 示例数据
