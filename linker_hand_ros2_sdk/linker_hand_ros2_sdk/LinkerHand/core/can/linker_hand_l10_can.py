@@ -411,6 +411,10 @@ class LinkerHandL10Can:
         time.sleep(0.002)
         self.send_frame(0x03,[])
         return self.x02+self.x03
+    
+    def get_finger_order(self):
+        return ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch",
+                        "index_mcp_roll", "ring_mcp_roll", "pinky_mcp_roll", "thumb_cmc_roll"]
 
     def show_fun_table(self):
         # if len(data) != 8 or data[0] != 0x64:

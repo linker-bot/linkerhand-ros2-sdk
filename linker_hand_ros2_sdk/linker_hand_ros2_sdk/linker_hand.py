@@ -243,7 +243,7 @@ class LinkerHand(Node):
         joint_state = JointState()
         joint_state.header = Header()
         joint_state.header.stamp = self.get_clock().now().to_msg()
-        joint_state.name = []
+        joint_state.name = self.api.get_finger_order()
         joint_state.position = [float(x) for x in pose]
         if len(vel) > 1:
             joint_state.velocity = [float(x) for x in vel]

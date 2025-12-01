@@ -127,8 +127,8 @@ _HAND_CONFIGS: Dict[str, HandConfig] = {
     # ),
     # 大拇指关节齿轮版L10
     "L10": HandConfig(
-        joint_names_en=["thumb_cmc_pitch", "thumb_cmc_roll", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch",
-                        "index_mcp_roll", "ring_mcp_roll", "pinky_mcp_roll", "thumb_cmc_yaw"],
+        joint_names_en=["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch",
+                        "index_mcp_roll", "ring_mcp_roll", "pinky_mcp_roll", "thumb_cmc_roll"],
         joint_names=["拇指根部", "拇指侧摆", "食指根部", "中指根部", "无名指根部",
                      "小指根部", "食指侧摆", "无名指侧摆", "小指侧摆", "拇指旋转"],
         init_pos=[255] * 10,
@@ -187,8 +187,8 @@ _HAND_CONFIGS: Dict[str, HandConfig] = {
     # ),
     # 大拇指关节齿轮版L7
     "L7": HandConfig(
-        joint_names=["大拇指弯曲", "大拇指横摆", "食指弯曲", "中指弯曲", "无名指弯曲",
-                     "小拇指弯曲", "拇指旋转"],
+        joint_names_en=["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch", "thumb_cmc_roll"],
+        joint_names=["大拇指弯曲", "大拇指横摆", "食指弯曲", "中指弯曲", "无名指弯曲", "小拇指弯曲", "拇指旋转"],
         init_pos=[250] * 7,
         preset_actions={
             "张开": [255, 111, 250, 250, 250, 250, 55],
