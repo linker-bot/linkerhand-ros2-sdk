@@ -9,6 +9,7 @@ import rclpy,sys                                     # ROS2 Python接口库
 import time
 
 from rclpy.node import Node                      # ROS2 节点类
+from rclpy.clock import Clock
 from std_msgs.msg import String, Header, Float32MultiArray
 from sensor_msgs.msg import JointState
 import time, json, threading
@@ -27,7 +28,8 @@ class LinkerHand(Node):
         self.declare_parameter('can', 'can0')
         self.declare_parameter('modbus', "None")        
 
-
+        # ros时间获取
+        self.stamp_clock = Clock()
         # 获取参数值
         self.hand_type = self.get_parameter('hand_type').value
         self.hand_joint = self.get_parameter('hand_joint').value
@@ -45,6 +47,10 @@ class LinkerHand(Node):
         self.last_hand_vel = [-1] * 10
         self.force = [[-1] * 5] * 4
         self.matrix_dic = {
+            "stamp":{
+                "sec": 0,
+                "nanosec": 0,
+            },
             "thumb_matrix":[[-1] * 12 for _ in range(6)],
             "index_matrix":[[-1] * 12 for _ in range(6)],
             "middle_matrix":[[-1] * 12 for _ in range(6)],
@@ -229,6 +235,12 @@ class LinkerHand(Node):
                 self.touch_pub.publish(msg)
             if self.is_touch == True and self.touch_type == 2 and self.matrix_touch_pub.get_subscription_count() > 0:
                 msg = String()
+                current_time = self.stamp_clock.now()
+                # 提取 secs 和 nsecs
+                t_sec = current_time.to_msg().sec
+                t_nanosec = current_time.to_msg().nanosec
+                self.matrix_dic["stamp"]["sec"] = t_sec
+                self.matrix_dic["stamp"]["nanosec"] = t_nanosec
                 msg.data = json.dumps(self.matrix_dic)
                 self.matrix_touch_pub.publish(msg)
             if self.hand_info_pub.get_subscription_count() > 0:
