@@ -51,11 +51,11 @@ class LinkerHand(Node):
                 "sec": 0,
                 "nanosec": 0,
             },
-            "thumb_matrix":[[-1] * 12 for _ in range(6)],
-            "index_matrix":[[-1] * 12 for _ in range(6)],
-            "middle_matrix":[[-1] * 12 for _ in range(6)],
-            "ring_matrix":[[-1] * 12 for _ in range(6)],
-            "little_matrix":[[-1] * 12 for _ in range(6)]
+            "thumb_matrix":[[-1] * 6 for _ in range(12)],
+            "index_matrix":[[-1] * 6 for _ in range(12)],
+            "middle_matrix":[[-1] * 6 for _ in range(12)],
+            "ring_matrix":[[-1] * 6 for _ in range(12)],
+            "little_matrix":[[-1] * 6 for _ in range(12)]
         }
         self.last_hand_info = {
             "version": [-1], # Dexterous hand version number
