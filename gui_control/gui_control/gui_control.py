@@ -123,7 +123,8 @@ class ROS2NodeManager(QObject):
                     elif self.hand_type == "right":
                         pose = range_to_arc_right_l20(positions)
                 else:
-                    print(f"当前{self.hand_joint} {self.hand_type}不支持弧度转换", flush=True)
+                    #print(f"当前{self.hand_joint} {self.hand_type}不支持弧度转换", flush=True)
+                    pass
                 self.joint_state.position = [float(pos) for pos in pose]
                 self.publisher_arc.publish(self.joint_state)
             self.status_updated.emit("info", "关节状态已发布")

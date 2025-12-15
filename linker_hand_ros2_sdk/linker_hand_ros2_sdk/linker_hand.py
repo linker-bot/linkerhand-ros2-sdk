@@ -71,7 +71,7 @@ class LinkerHand(Node):
         }
         self.version = []
         self.touch_type = -1
-        
+        self.hz = 1.0/60.0
 
         self.hand_setting_sub = self.create_subscription(String,'/cb_hand_setting_cmd', self.hand_setting_cb, 10)
         self._init_hand()
@@ -150,14 +150,17 @@ class LinkerHand(Node):
     def run(self):
         if self.sdk_v == 1:
             self.sleep_time = 0.009
+        if self.hand_state_pub.get_subscription_count() > 0:
+            # 优先获取手指状态并且发布
+            self.last_hand_state = self.api.get_state()
+            time.sleep(0.003)
+            self.last_hand_vel = self.api.get_joint_speed()
+            time.sleep(0.003)
         if self.cmd_lock == False:
-            #if self.run_count % 2 == 0:
-                #print(f"{self.run_count}:接收CMD指令", flush=True)
-                # 先判断是否需要执行手指运动
             if self.last_hand_post_cmd != None:
                 self.api.finger_move(pose=self.last_hand_post_cmd)
                 self.last_hand_post_cmd = None
-                time.sleep(0.005)
+                time.sleep(0.003)
             if self.last_hand_vel_cmd != None:
                 vel = list(self.last_hand_vel_cmd)
                 if all(x == 0 for x in vel):
@@ -182,12 +185,6 @@ class LinkerHand(Node):
                         speed = vel
                         self.api.set_joint_speed(speed=speed)
                 self.last_hand_vel_cmd = None
-                time.sleep(0.005)
-            if self.run_count % 2 == 0 and self.hand_state_pub.get_subscription_count() > 0:
-                # 获取手指状态并且发布
-                self.last_hand_state = self.api.get_state()
-                time.sleep(0.003)
-                self.last_hand_vel = self.api.get_joint_speed()
                 time.sleep(0.003)
             if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
@@ -247,7 +244,7 @@ class LinkerHand(Node):
                 msg = String()
                 msg.data = json.dumps(self.last_hand_info)
                 self.hand_info_pub.publish(msg)
-            time.sleep(1/60)
+            time.sleep(self.hz)
 
     
 
