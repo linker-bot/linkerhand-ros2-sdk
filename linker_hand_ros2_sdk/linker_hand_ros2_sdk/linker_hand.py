@@ -153,14 +153,11 @@ class LinkerHand(Node):
         if self.hand_state_pub.get_subscription_count() > 0:
             # 优先获取手指状态并且发布
             self.last_hand_state = self.api.get_state()
-            time.sleep(0.003)
             self.last_hand_vel = self.api.get_joint_speed()
-            time.sleep(0.003)
         if self.cmd_lock == False:
             if self.last_hand_post_cmd != None:
                 self.api.finger_move(pose=self.last_hand_post_cmd)
                 self.last_hand_post_cmd = None
-                time.sleep(0.003)
             if self.last_hand_vel_cmd != None:
                 vel = list(self.last_hand_vel_cmd)
                 if all(x == 0 for x in vel):
@@ -185,7 +182,7 @@ class LinkerHand(Node):
                         speed = vel
                         self.api.set_joint_speed(speed=speed)
                 self.last_hand_vel_cmd = None
-                time.sleep(0.003)
+            time.sleep(0.004)
             if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 self.force = self.api.get_force()
