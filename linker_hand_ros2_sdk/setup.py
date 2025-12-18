@@ -39,6 +39,10 @@ setup(
     entry_points={
         'console_scripts': [
             'linker_hand_sdk = linker_hand_ros2_sdk.linker_hand:main',
+            'linker_hand_advanced_l6 = linker_hand_ros2_sdk.linker_hand_advanced_l6:main',
+            'linker_hand_advanced_l7 = linker_hand_ros2_sdk.linker_hand_advanced_l7:main',
+            'linker_hand_advanced_o6 = linker_hand_ros2_sdk.linker_hand_advanced_o6:main',
+            'linker_hand_advanced_g20 = linker_hand_ros2_sdk.linker_hand_advanced_g20:main',
         ],
     },
 )

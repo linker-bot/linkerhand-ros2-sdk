@@ -250,3 +250,42 @@ $ ros2 launch gui_control gui_control.launch.py
 
 
 
+## 进阶用法 支持O6\L6\L7\G20
+ - 如果仅需求控制、获取状态、获取压感信息。可以使用以下进阶用法。一般用于数据采集使用。
+```bash
+#'/cb_{self.hand_type}_hand_control_cmd' 话题类型为 sensor_msgs/msg/JointState 控制话题，限制 30Hz
+#‘/cb_{self.hand_type}_hand_state’ 话题类型为 sensor_msgs/msg/JointState 40Hz以上
+#'/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 40Hz以上
+#'/cb_{self.hand_type}_hand_matrix_touch_pc' 话题类型为 sensor_msgs/msg/PointCloud2 40Hz以上 将矩阵压感点云格式发布
+# 以O6为例
+$ cd linker_hand_ros2_sdk/
+$ colcon build --symlink-install
+$ source ./install/setup.bash
+$ sudo /usr/sbin/ip link set can0 up type can bitrate 1000000 #USB转CAN设备蓝色灯常亮状态 在按照要求修改setting.ymal配置文件后
+$ ros2 run linker_hand_ros2_sdk linker_hand_advanced_o6 --hand_type left --can can0 --is_touch true
+#其他型号灵巧手启动方式
+# L6 右手 不带指尖压感
+$ ros2 run linker_hand_ros2_sdk linker_hand_advanced_l6 --hand_type right --can can0 --is_touch false
+# L7 左手 带指尖压感
+$ ros2 run linker_hand_ros2_sdk linker_hand_advanced_l7 --hand_type left --can can0 --is_touch true
+# G20 左手 带指尖压感
+$ ros2 run linker_hand_ros2_sdk linker_hand_advanced_g20 --hand_type left --can can0 --is_touch true
+```
+ - 进阶用法，双手控制 支持O6\L6\L7\G20
+新开终端1
+```bash
+# 以O6为例
+$ cd linker_hand_ros2_sdk/
+$ colcon build --symlink-install
+$ source ./install/setup.bash
+$ sudo /usr/sbin/ip link set can0 up type can bitrate 1000000 #USB转CAN设备蓝色灯常亮状态 在按照要求修改setting.ymal配置文件后
+$ ros2 run linker_hand_ros2_sdk linker_hand_advanced_o6 --hand_type left --can can0 --is_touch true #开启左手 带压感
+```
+新开终端2
+```bash
+# 以O6为例
+$ cd linker_hand_ros2_sdk/
+$ source ./install/setup.bash
+$ sudo /usr/sbin/ip link set can1 up type can bitrate 1000000 #USB转CAN设备蓝色灯常亮状态
+$ ros2 run linker_hand_ros2_sdk linker_hand_advanced_o6 --hand_type right --can can1 --is_touch false #开启右手  不带压感
+```

@@ -226,7 +226,7 @@ class LinkerHandG20Can:
         self.receive_thread.daemon = True
         self.receive_thread.start()
 
-    def send_command(self, frame_property, data_list, sleep_time=0.003):
+    def send_command(self, frame_property, data_list, sleep_time=0.002):
         """
         发送指令到CAN总线
         :param frame_property: 数据帧属性
@@ -761,7 +761,6 @@ class LinkerHandG20Can:
         self.get_middle_positions()
         self.get_ring_positions()
         self.get_little_positions()
-        time.sleep(0.002)
         s = [self.x41, self.x42, self.x43, self.x44, self.x45]
         cmd_state = self.joint_state_to_cmd_state(list=s)
         return cmd_state
