@@ -69,7 +69,7 @@ class LinkerHandAdvancedL7(Node):
         self.hand_cmd_sub = self.create_subscription(JointState, f'/cb_{self.hand_type}_hand_control_cmd', self.hand_control_cb,10)
         self.hand_state_pub = self.create_publisher(JointState, f'/cb_{self.hand_type}_hand_state',10)
         if self.is_touch == True:
-            if self.touch_type == 2:
+            if self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
             elif self.touch_type != -1:

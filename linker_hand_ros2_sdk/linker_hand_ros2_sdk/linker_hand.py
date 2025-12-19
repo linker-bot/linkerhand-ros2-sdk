@@ -90,7 +90,7 @@ class LinkerHand(Node):
         self.hand_state_pub = self.create_publisher(JointState, f'/cb_{self.hand_type}_hand_state',10)
         self.hand_info_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_info', 10)
         if self.is_touch == True:
-            if self.touch_type == 2:
+            if self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
             elif self.touch_type != -1:
@@ -186,7 +186,7 @@ class LinkerHand(Node):
             if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 self.force = self.api.get_force()
-            if self.is_touch == True and self.touch_type == 2 and self.matrix_touch_pub.get_subscription_count() > 0:
+            if self.is_touch == True and self.touch_type > 1 and self.matrix_touch_pub.get_subscription_count() > 0:
                 """矩阵式压力传感器"""
                 if self.run_count == 3:
                     self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch(sleep_time=self.sleep_time).tolist()
@@ -227,7 +227,7 @@ class LinkerHand(Node):
                 msg = Float32MultiArray()
                 msg.data = [float(val) for sublist in self.force for val in sublist]
                 self.touch_pub.publish(msg)
-            if self.is_touch == True and self.touch_type == 2 and self.matrix_touch_pub.get_subscription_count() > 0:
+            if self.is_touch == True and self.touch_type > 1 and self.matrix_touch_pub.get_subscription_count() > 0:
                 msg = String()
                 current_time = self.stamp_clock.now()
                 # 提取 secs 和 nsecs

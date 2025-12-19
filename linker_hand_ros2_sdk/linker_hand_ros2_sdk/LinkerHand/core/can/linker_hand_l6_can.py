@@ -65,6 +65,8 @@ class LinkerHandL6Can:
     def init_can_bus(self, channel, baudrate):
         try:
             if sys.platform == "linux":
+                self.open_can.open_can(self.can_channel)
+                time.sleep(0.1)
                 return can.interface.Bus(channel=channel, interface="socketcan", bitrate=baudrate)
             elif sys.platform == "win32":
                 return can.interface.Bus(channel=channel, interface='pcan', bitrate=baudrate)
@@ -74,7 +76,7 @@ class LinkerHandL6Can:
             #print("Please insert CAN device")
             ColorMsg(msg="Warning: Please insert CAN device", color="red")
 
-    def send_frame(self, frame_property, data_list,sleep=0.005):
+    def send_frame(self, frame_property, data_list,sleep=0.003):
         """Send a single CAN frame with specified properties and data."""
         frame_property_value = int(frame_property.value) if hasattr(frame_property, 'value') else frame_property
         data = [frame_property_value] + [int(val) for val in data_list]
@@ -160,8 +162,11 @@ class LinkerHandL6Can:
     def process_response(self, msg):
         """Process received CAN messages."""
         if msg.arbitration_id == self.can_id:
-            frame_type = msg.data[0]
-            response_data = msg.data[1:]
+            try:
+                frame_type = msg.data[0]
+                response_data = msg.data[1:]
+            except:
+                return
             if frame_type == 0x01:   # 0x01
                 self.x01 = list(response_data)
             elif frame_type == 0x02:    # 0x02
