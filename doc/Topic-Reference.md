@@ -112,11 +112,11 @@ data: "{"thumb_matrix": [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0,
 **Parameters**:
 - `data`:
 ```bash
-thumb_matrix：大拇指矩阵压力值 0~255
-index_matrix：食指矩阵压力值 0~255
-middle_matrix：中指矩阵压力值 0~255
-ring_matrix：无名指矩阵压力值 0~255
-little_matrix：小拇指矩阵压力值 0~255
+thumb_matrix：大拇指矩阵压力值 0~255 (6 * 12 or 4 * 10) 二维list
+index_matrix：食指矩阵压力值 0~255 (6 * 12 or 4 * 10) 二维list
+middle_matrix：中指矩阵压力值 0~255 (6 * 12 or 4 * 10) 二维list
+ring_matrix：无名指矩阵压力值 0~255 (6 * 12 or 4 * 10) 二维list
+little_matrix：小拇指矩阵压力值 0~255 (6 * 12 or 4 * 10) 二维list
 ```
 ---
 ### 获取LinkerHand配置信息 Topic /cb_left_hand_info or /cb_right_hand_info
