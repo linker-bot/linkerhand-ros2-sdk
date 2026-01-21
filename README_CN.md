@@ -29,6 +29,9 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
 ```bash
   $ sudo apt install python3-can
   $ cd linker_hand_ros2_sdk/src/
+  # win下需要安装python-can-candle用于适配透明CAN设备candle协议
+  $ pip install python-can
+  $ pip install python-can-candle
   $ pip install -r requirements.txt
 ```
 
