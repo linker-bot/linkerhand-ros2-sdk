@@ -1,9 +1,6 @@
 #!/usr/bin/env python3 
 # -*- coding: utf-8 -*-
-'''
-编译: colcon build --symlink-install
-启动命令:ros2 run linker_hand_ros2_sdk linker_hand_sdk
-'''
+
 from re import A
 import rclpy,sys                                     # ROS2 Python接口库
 import time
@@ -57,6 +54,18 @@ class LinkerHandAdvancedG20(Node):
             "ring_matrix":[[-1] * 6 for _ in range(12)],
             "little_matrix":[[-1] * 6 for _ in range(12)]
         }
+        # 压感矩阵合值，单位g 克
+        self.matrix_mass_dic = {
+            "stamp":{
+                "secs": 0,
+                "nsecs": 0,
+            },
+            "thumb_mass":[-1],
+            "index_mass":[-1],
+            "middle_mass":[-1],
+            "ring_mass":[-1],
+            "little_mass":[-1]
+        }
         self.hz = 1.0/60.0
         # ros时间获取
         self.stamp_clock = Clock()
@@ -85,6 +94,7 @@ class LinkerHandAdvancedG20(Node):
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
                 self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
+                self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
             elif self.touch_type != -1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
                 self.touch_pub = self.create_publisher(Float32MultiArray, f'/cb_{self.hand_type}_hand_force', 10)
@@ -128,24 +138,17 @@ class LinkerHandAdvancedG20(Node):
         return joint_state
 
     def run(self):
-        # 优先获取手指状态并且发布
-        self.last_hand_state = self.api.get_state()
-        self.last_hand_vel = self.api.get_joint_speed()
-        # 发布手状态
-        msg_state = self.joint_state_msg(self.last_hand_state, self.last_hand_vel)
-        self.hand_state_pub.publish(msg_state)
         # 执行手控制指令
         if self.last_hand_post_cmd != None:
             self.api.finger_move(pose=self.last_hand_post_cmd)
             self.last_hand_post_cmd = None
-        if self.last_hand_vel_cmd != None:
-            vel = list(self.last_hand_vel_cmd)
-            if all(x == 0 for x in vel):
-                pass
-            else:
-                speed = vel
-                self.api.set_joint_speed(speed=speed)
-            self.last_hand_vel_cmd = None
+        # 优先获取手指状态并且发布
+        self.last_hand_state = self.api.get_state()
+        self.last_hand_vel = [0.0] * len(self.last_hand_state)
+        # 发布手状态
+        msg_state = self.joint_state_msg(self.last_hand_state, self.last_hand_vel)
+        self.hand_state_pub.publish(msg_state)
+        
         if self.is_touch == True:
             # 获取压感数据
             if self.count == 2:
@@ -158,20 +161,47 @@ class LinkerHandAdvancedG20(Node):
                 self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
             if self.count == 10:
                 self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
-            # 发布压感数据
-            msg = String()
-            current_time = self.stamp_clock.now()
-            # 提取 secs 和 nsecs
-            t_sec = current_time.to_msg().sec
-            t_nanosec = current_time.to_msg().nanosec
-            self.matrix_dic["stamp"]["sec"] = t_sec
-            self.matrix_dic["stamp"]["nanosec"] = t_nanosec
-            msg.data = json.dumps(self.matrix_dic)
-            self.matrix_touch_pub.publish(msg)
+            # 发布矩阵压感数据JSON格式
+            self.pub_matrix_dic()
+            # 发布矩阵压感和值JSON格式
+            self.pub_matrix_mass(dic=self.matrix_dic)
+            # 发布矩阵压感点云格式
             self.pub_matrix_point_cloud()
         self.count += 1
         if self.count == 11:
             self.count = 0
+
+    def pub_matrix_dic(self):
+        """发布矩阵数据JSON格式"""
+        msg = String()
+        # 获取当前的 ROS 时间
+        current_time = self.stamp_clock.now()
+        # 提取 secs 和 nsecs
+        t_secs = current_time.to_msg().sec
+        t_nsecs = current_time.to_msg().nanosec
+        self.matrix_dic["stamp"]["secs"] = t_secs
+        self.matrix_dic["stamp"]["nsecs"] = t_nsecs
+        msg.data = json.dumps(self.matrix_dic)
+        self.matrix_touch_pub.publish(msg)
+
+    def pub_matrix_mass(self, dic):
+        """发布矩阵数据合值 单位g 克 JSON格式"""
+        msg = String()
+        # 获取当前的 ROS 时间
+        current_time = self.stamp_clock.now()
+        # 提取 secs 和 nsecs
+        t_secs = current_time.to_msg().sec
+        t_nsecs = current_time.to_msg().nanosec
+        self.matrix_mass_dic["stamp"]["secs"] = t_secs
+        self.matrix_mass_dic["stamp"]["nsecs"] = t_nsecs
+        self.matrix_mass_dic["unit"] = "g"
+        self.matrix_mass_dic["thumb_mass"] = sum(sum(row) for row in dic["thumb_matrix"])
+        self.matrix_mass_dic["index_mass"] = sum(sum(row) for row in dic["index_matrix"])
+        self.matrix_mass_dic["middle_mass"] = sum(sum(row) for row in dic["middle_matrix"])
+        self.matrix_mass_dic["ring_mass"] = sum(sum(row) for row in dic["ring_matrix"])
+        self.matrix_mass_dic["little_mass"] = sum(sum(row) for row in dic["little_matrix"])
+        msg.data = json.dumps(self.matrix_mass_dic)
+        self.matrix_touch_mass_pub.publish(msg)
 
     def pub_matrix_point_cloud(self):
         tmp_dic = self.matrix_dic.copy()
