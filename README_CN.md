@@ -260,6 +260,7 @@ $ ros2 launch gui_control gui_control.launch.py
 #‘/cb_{self.hand_type}_hand_state’ 话题类型为 sensor_msgs/msg/JointState 40Hz以上
 #'/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 40Hz以上
 #'/cb_{self.hand_type}_hand_matrix_touch_pc' 话题类型为 sensor_msgs/msg/PointCloud2 40Hz以上 将矩阵压感点云格式发布
+#'/cb_{self.hand_type}_hand_matrix_touch_mass' 话题类型为 std_msgs/msg/String 40Hz以上
 # 以O6为例
 $ cd linker_hand_ros2_sdk/
 $ colcon build --symlink-install
