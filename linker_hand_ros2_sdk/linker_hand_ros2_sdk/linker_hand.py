@@ -200,7 +200,7 @@ class LinkerHand(Node):
             if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 self.force = self.api.get_force()
-            if self.is_touch == True and self.touch_type > 1 and self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0:
+            if self.is_touch == True and self.touch_type > 1 and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
                 """矩阵式压力传感器"""
                 if self.run_count == 3:
                     self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch(sleep_time=self.sleep_time).tolist()
@@ -241,7 +241,7 @@ class LinkerHand(Node):
                 msg = Float32MultiArray()
                 msg.data = [float(val) for sublist in self.force for val in sublist]
                 self.touch_pub.publish(msg)
-            if self.is_touch == True and self.touch_type > 1 and self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0:
+            if self.is_touch == True and self.touch_type > 1 and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
                 # 发布矩阵压感数据JSON格式
                 self.pub_matrix_dic()
                 # 发布矩阵压感和值JSON格式
