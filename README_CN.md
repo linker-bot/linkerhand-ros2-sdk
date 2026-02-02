@@ -214,19 +214,21 @@ $ ros2 launch gui_control gui_control.launch.py
     )
 ```
 
-## [示例] [matrix_touch_gui(矩阵式压感热力示意图)]
-矩阵式压感热力示意图可以通过显示LinkerHand灵巧手各个关节的指尖矩阵压力传感器数据，并以热力图的形式展示。确认灵巧手配备矩阵式压力传感器后才可使用。
+## [示例] [pressure_diagram(矩阵式压感波形图与热力示意图)]
+ - 注：默认gui_control会默认启动pressure_diagram矩阵式压感波形图与热力示意图
+矩阵式压感热力示意图可以通过显示LinkerHand灵巧手各个关节的指尖矩阵压力传感器数据，并以波形图和热力图的形式展示。确认灵巧手配备矩阵式压力传感器后才可使用。
 开启ROS2 SDK后
-&ensp;&ensp; __使用前请先将 [matrix_touch_gui.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/matrix_touch_gui/launch/matrix_touch_gui.launch.py)文件按照实际灵巧手参数进行配置.__
+&ensp;&ensp; __使用前请先将 [pressure_diagram.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/pressure_diagram/launch/pressure_diagram.launch.py)文件按照实际灵巧手参数进行配置.__
 
-<img  src="resource/matrix_touch.png" width="550">
+<img  src="resource/pressure_diagram.png" width="550">
 
 
 ```bash
+# 带有矩阵式压力传感器的Linker Hand的SDK启动成功后
 # 新开终端
 $ cd linker_hand_ros2_sdk/
 $ source ./install/setup.bash
-$ ros2 launch matrix_touch_gui matrix_touch_gui.launch.py
+$ ros2 launch pressure_diagram pressure_diagram.launch.py
 ```
 
 ## WIN+ROS2环境下使用GUI

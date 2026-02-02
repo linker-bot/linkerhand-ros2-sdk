@@ -3,8 +3,7 @@
 import os
 from glob import glob
 from setuptools import find_packages, setup
-
-package_name = 'matrix_touch_gui'
+package_name = 'pressure_diagram'
 
 setup(
     name=package_name,
@@ -13,19 +12,23 @@ setup(
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='linkerhand',
-    maintainer_email='hejianxin79@hotmail.com',
-    description='TODO: Package description',
+    maintainer_email='linkerhand@todo.todo',
+    description='ROS2 Pressure Diagram - Real-time pressure sensor visualization for Linker Hand',
     license='Apache-2.0',
-    tests_require=['pytest'],
+    extras_require={
+        'test': [
+            'pytest',
+        ],
+    },
     entry_points={
         'console_scripts': [
-            'matrix_touch_gui = matrix_touch_gui.matrix_touch_gui:main'
+            'pressure_diagram = pressure_diagram.pressure_diagram:main',
         ],
     },
 )
