@@ -12,7 +12,7 @@ This document provides a detailed overview of the ROS Topic for the Linker Hand,
 /cb_left_hand_force # 左手压感数据显示话题
 /cb_left_hand_matrix_touch # 左手矩阵压感数据显示话题 list(6x12)
 /cb_left_hand_matrix_touch_pc # 左手矩阵压感数点云格式显示话题
-/cb_left_hand_matrix_touch_mass # 左手矩阵压感数和值据显示话题 单位g
+/cb_left_hand_matrix_touch_mass # 左手矩阵压感数和值显示话题 单位g
 /cb_left_hand_info  # 左手配置信息显示话题
 /cb_left_hand_state # 左手状态显示话题 范围
 /cb_left_hand_state_arc # 左手状态显示话题 弧度
@@ -21,7 +21,7 @@ This document provides a detailed overview of the ROS Topic for the Linker Hand,
 /cb_right_hand_force # 右手压感数据显示话题
 /cb_right_hand_matrix_touch # 右手矩阵压感数据显示话题 list(6x12)
 /cb_right_hand_matrix_touch_pc # 右手矩阵压感数点云格式显示话题
-/cb_right_hand_matrix_touch_mass # 右手矩阵压感数和值据显示话题 单位g
+/cb_right_hand_matrix_touch_mass # 右手矩阵压感数和值显示话题 单位g
 /cb_right_hand_info # 右手配置信息显示话题
 /cb_right_hand_state # 右手状态显示话题 范围
 /cb_right_hand_state_arc # 右手状态显示话题 弧度
