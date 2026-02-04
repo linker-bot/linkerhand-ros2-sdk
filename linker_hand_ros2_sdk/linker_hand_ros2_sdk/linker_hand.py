@@ -167,7 +167,9 @@ class LinkerHand(Node):
         if self.hand_state_pub.get_subscription_count() > 0:
             # 优先获取手指状态并且发布
             self.last_hand_state = self.api.get_state()
+            time.sleep(0.003)
             self.last_hand_vel = self.api.get_joint_speed()
+            time.sleep(0.002)
         if self.cmd_lock == False:
             if self.last_hand_post_cmd != None:
                 self.api.finger_move(pose=self.last_hand_post_cmd)
@@ -196,7 +198,7 @@ class LinkerHand(Node):
                         speed = vel
                         self.api.set_joint_speed(speed=speed)
                 self.last_hand_vel_cmd = None
-            time.sleep(0.004)
+            time.sleep(0.003)
             if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 self.force = self.api.get_force()
@@ -212,6 +214,7 @@ class LinkerHand(Node):
                     self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=self.sleep_time).tolist()
                 if self.run_count == 7:
                     self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=self.sleep_time).tolist()
+                time.sleep(0.005)
             if self.run_count == 8 and self.hand_info_pub.get_subscription_count() > 0:
                 """手部信息"""
                 self.last_hand_info = {
@@ -229,7 +232,7 @@ class LinkerHand(Node):
             if self.run_count == 9:
                 self.run_count = 0
             self.run_count += 1
-            time.sleep(0.005)
+            time.sleep(0.003)
 
 
     def pub_state(self):
