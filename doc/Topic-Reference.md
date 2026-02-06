@@ -281,3 +281,34 @@ velocity: [255,255,255,255,255,255,255,255,255,255]
 effort: [0.0, 0.0]
 "
 ```
+
+# L20
+- L20右手握拳
+```bash
+ros2 topic pub /cb_right_hand_control_cmd sensor_msgs/msg/JointState "
+header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: ''
+name: []
+position: [40, 0, 0, 0, 0, 131, 10, 100, 180, 240, 19, 255, 255, 255, 255, 135, 0, 0, 0, 0]
+velocity: [255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255]
+effort: []
+"
+```
+
+- L20右手张开
+```bash
+ros2 topic pub /cb_right_hand_control_cmd sensor_msgs/msg/JointState "
+header:
+  stamp:
+    sec: 0
+    nanosec: 0
+  frame_id: ''
+name: []
+position: [255, 255, 255, 255, 255, 255, 10, 100, 180, 240, 245, 255, 255, 255, 255, 255, 255, 255, 255, 255]
+velocity: [255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255]
+effort: []
+"
+```
