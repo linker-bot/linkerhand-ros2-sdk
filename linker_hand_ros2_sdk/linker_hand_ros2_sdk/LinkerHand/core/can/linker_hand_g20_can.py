@@ -703,10 +703,14 @@ class LinkerHandG20Can:
         self.send_command(FrameProperty.HAND_TANGENTIAL_FORCE_DIR, [])
         return self.x92
     
-    def get_approach_sensing(self):
+    def get_approach_inc(self):
         """获取五指接近感应"""
         self.send_command(FrameProperty.HAND_APPROACH_INC, [])
         return self.x93
+    
+    def get_force(self):
+        '''Get pressure sensor data'''
+        return [self.x90,self.x91,self.x92,self.x93]
 
     # 触觉传感器方法
     def get_touch_sensor_type(self):
