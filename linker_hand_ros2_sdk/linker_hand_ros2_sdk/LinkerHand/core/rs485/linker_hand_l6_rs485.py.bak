@@ -104,11 +104,11 @@ class LinkerHandL6RS485:
         cols = 6   # 6 列
         finger_size = rows * cols  # 72 个数据点
         
-        # modbus 地址和计数 (按协议文档)
-        write_address = 36  # 写入手指选择 (保持寄存器)
-        read_address = 52   # 读取压力数据 (输入寄存器)
-        read_count = 71     # 读取 71 个寄存器
-        skip_count = 0      # 不跳过数据点
+        # modbus 地址和计数
+        write_address = 60  # 写入手指选择
+        read_address = 62   # 读取压力数据
+        read_count = 96     # 读取 96 个寄存器
+        skip_count = 10     # 跳过前 10 个校验点
         
         # 0. 参数校验和手指写入值确定
         if finger < 1 or finger > 5:
@@ -116,16 +116,16 @@ class LinkerHandL6RS485:
             
         finger_write_value = finger 
         
-        # 1. 写入手指选择寄存器 (地址 36)
-        time.sleep(0.08)
+        # 1. 写入手指选择寄存器 (地址 60)
+        time.sleep(0.008)
         wrsp = self.cli.write_register(address=write_address, value=finger_write_value, slave=self.slave)
         if wrsp.isError():
             raise RuntimeError(f"写入手指选择 {finger} 到地址 {write_address} 失败: {wrsp}")
 
         # 写入后等待片刻
-        time.sleep(0.08) 
+        time.sleep(0.008) 
         
-        # 2. 读取地址 52 的数据
+        # 2. 读取地址 62 的数据
         rrsp = self.cli.read_input_registers(address=read_address, count=read_count, slave=self.slave)
         
         if rrsp.isError():
@@ -134,35 +134,22 @@ class LinkerHandL6RS485:
         registers_16bit: List[int] = rrsp.registers 
         
         # 3. 核心数据处理
-        # a. 提取低 8 位数据 (得到 71 个 8 位数据点)
-        final_data_71 = [reg_value & 255 for reg_value in registers_16bit]
+        # a. 提取低 8 位数据 (得到 96 个 8 位数据点)
+        final_data_96 = [reg_value & 255 for reg_value in registers_16bit]
         
-        # b. 不跳过数据点 (按协议)
-        effective_data = np.array(final_data_71, dtype=np.uint8)
-        
-        # c. 截取当前手指的矩阵数据 (71 个有效点中截取 72 个点，可能需要多读)
-        # 注: 协议返回 71 个点，手指数 1-5，每个手指需要 72 点
-        # 这里取全部数据
+        # b. 跳过前 10 个校验/头部数据点 (得到 86 个有效数据点)
+        effective_data = np.array(final_data_96[skip_count:], dtype=np.uint8)
+        # c. 截取当前手指的矩阵数据 (从 86 个有效点中截取 72 个点)
         start_idx = 0 
-        end_idx = min(len(effective_data), finger_size)  # 取较小值
-
+        end_idx = finger_size  # 72
+        
         finger_data_flat = effective_data[start_idx:end_idx]
         
         # d. 验证数据长度
-        if finger_data_flat.size < finger_size:
-            # 如果数据不足，尝试多读一些
-            rrsp2 = self.cli.read_input_registers(address=read_address + read_count, count=10, slave=self.slave)
-            if not rrsp2.isError():
-                extra_data = [reg_value & 255 for reg_value in rrsp2.registers]
-                finger_data_flat = np.concatenate([finger_data_flat, np.array(extra_data, dtype=np.uint8)])
-        
-        # 最终确保有足够数据
-        if finger_data_flat.size >= finger_size:
-            finger_data_flat = finger_data_flat[:finger_size]
-        else:
+        if finger_data_flat.size != finger_size:
             raise ValueError(
                 f"数据提取失败。期望 {finger_size} 点 ({rows}x{cols})，"
-                f"但仅获取到 {finger_data_flat.size} 点。请检查协议。"
+                f"但仅截取到 {finger_data_flat.size} 点。请检查协议，确认地址 62 是否一次性返回了所有手指数据。"
             )
             
         # e. 重塑为二维矩阵 (12 行 6 列)

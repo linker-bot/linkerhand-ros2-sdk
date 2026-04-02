@@ -102,17 +102,22 @@ class LinkerHand(Node):
         self.hand_state_pub = self.create_publisher(JointState, f'/cb_{self.hand_type}_hand_state',10)
         self.hand_info_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_info', 10)
         if self.is_touch == True:
-            if self.touch_type > 1:
+            if self.modbus != "None":
+                self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
+                self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
+                self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
+            elif self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
                 self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
                 self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
-            elif self.touch_type != -1:
+            elif self.touch_type != -1 and self.modbus == "None":
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
                 self.touch_pub = self.create_publisher(Float32MultiArray, f'/cb_{self.hand_type}_hand_force', 10)
             else:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Not equipped with any pressure sensors", color="red")
                 self.is_touch = False
+            
         self.embedded_version = self.api.get_embedded_version()
         pose = None
         torque = [200, 200, 200, 200, 200]
@@ -199,10 +204,10 @@ class LinkerHand(Node):
                         self.api.set_joint_speed(speed=speed)
                 self.last_hand_vel_cmd = None
             time.sleep(0.003)
-            if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
+            if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.modbus == "None" and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 self.force = self.api.get_force()
-            if self.is_touch == True and self.touch_type > 1 and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
+            if self.is_touch == True and (self.touch_type > 1 or self.modbus != "None") and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
                 """矩阵式压力传感器"""
                 if self.run_count == 3:
                     self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch(sleep_time=self.sleep_time).tolist()
@@ -240,11 +245,11 @@ class LinkerHand(Node):
             if self.hand_state_pub.get_subscription_count() > 0:
                 msg = self.joint_state_msg(self.last_hand_state, self.last_hand_vel)
                 self.hand_state_pub.publish(msg)
-            if self.is_touch == True and self.touch_type == 1 and self.touch_pub.get_subscription_count() > 0:
+            if self.is_touch == True and self.touch_type == 1 and self.modbus == "None" and self.touch_pub.get_subscription_count() > 0:
                 msg = Float32MultiArray()
                 msg.data = [float(val) for sublist in self.force for val in sublist]
                 self.touch_pub.publish(msg)
-            if self.is_touch == True and self.touch_type > 1 and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
+            if self.is_touch == True and (self.touch_type > 1 or self.modbus != "None") and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
                 # 发布矩阵压感数据JSON格式
                 self.pub_matrix_dic()
                 # 发布矩阵压感和值JSON格式
