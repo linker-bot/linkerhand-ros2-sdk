@@ -414,6 +414,9 @@ class LinkerHandO6RS485:
     
     def get_matrix_touch_v2(self) -> list:
         return self.get_matrix_touch()
+
+    def get_finger_order(self):
+        return ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch"]
     
     # ----------------------------------------------------------
     # 上下文管理
