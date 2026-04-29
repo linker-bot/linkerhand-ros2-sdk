@@ -318,9 +318,9 @@ class LinkerHandO6Can:
         return self.x01
 
     def get_speed(self):
-        #self.send_frame(0x05, [],sleep=0.003)
+        self.send_frame(0x05, [],sleep=0.002)
         #print("L6暂不支持读取实时速度")
-        return [0] * 6
+        return self.x05
 
     def get_current(self):
         '''Not supported yet.'''
