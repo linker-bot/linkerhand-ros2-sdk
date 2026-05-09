@@ -940,7 +940,7 @@ class LinkerHandG20Can:
 
     def clear_faults(self):
         """API接口:清除手指故障代码"""
-        pass
+        self.clear_finger_faults(finger_mask=[1, 1, 1, 1, 1])
 
     def cmd_range_to_joint_range(self,cmd_list):
         """根据手指映射关系，将手指控制命令列表转换为手指分组数据形式"""

@@ -294,10 +294,8 @@ class LinkerHandApi:
     
     def clear_faults(self):
         '''Clear motor fault codes Not supported yet, currently only supports L20'''
-        if self.hand_joint == "L20":
-            self.hand.clear_faults()
-        else:
-            return [0] * 5
+        self.hand.clear_faults()
+        return [0] * 5
 
     def set_enable(self):
         '''Set motor enable Only supports L25'''

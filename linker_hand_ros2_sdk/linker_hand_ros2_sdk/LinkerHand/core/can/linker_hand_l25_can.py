@@ -795,7 +795,9 @@ class LinkerHandL25Can:
     def close_can_interface(self):
         if self.bus:
             self.bus.shutdown()
-    
+    def clear_faults(self, finger_mask=[1, 1, 1, 1, 1]):
+        """L25 暂不支持清除故障码"""
+        pass
     '''
     这个方法只用于展示数据关系映射，使用的话最好使用上面的方法
     '''

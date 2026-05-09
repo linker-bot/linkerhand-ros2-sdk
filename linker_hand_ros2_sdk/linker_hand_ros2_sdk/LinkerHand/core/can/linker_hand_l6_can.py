@@ -395,6 +395,10 @@ class LinkerHandL6Can:
 
     def show_fun_table(self):
         pass
+    
+    def clear_faults(self, finger_mask=[1, 1, 1, 1, 1]):
+        """O6 暂不支持清除故障码"""
+        pass
 
     def get_serial_number(self):
         try:

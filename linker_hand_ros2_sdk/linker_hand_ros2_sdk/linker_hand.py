@@ -234,7 +234,9 @@ class LinkerHand(Node):
                     "touch_type": self.touch_type,
                     "finger_order": self.api.get_finger_order() # Finger motor order
                 }
+                
             if self.run_count == 9:
+                self.api.clear_faults() # 自动清除错误编码
                 self.run_count = 0
             self.run_count += 1
             time.sleep(0.003)

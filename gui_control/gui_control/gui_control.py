@@ -408,8 +408,8 @@ class HandControlGUI(QWidget):
         panel = QWidget()
         layout = QVBoxLayout(panel)
         
-        # 系统预设动作
-        sys_preset_group = QGroupBox("系统预设")
+        # 自定义预设动作
+        sys_preset_group = QGroupBox("自定义预设动作(名称不可重复)")
         sys_preset_layout = QGridLayout(sys_preset_group)
         sys_preset_layout.setSpacing(8)
         

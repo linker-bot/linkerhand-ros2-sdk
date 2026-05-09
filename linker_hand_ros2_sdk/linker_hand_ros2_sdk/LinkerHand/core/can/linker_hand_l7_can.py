@@ -406,6 +406,10 @@ class LinkerHandL7Can:
     def show_fun_table(self):
         pass
 
+    def clear_faults(self, finger_mask=[1, 1, 1, 1, 1]):
+        """L7 暂不支持清除故障码"""
+        pass
+
     def close_can_interface(self):
         """Stop the CAN communication."""
         self.running = False

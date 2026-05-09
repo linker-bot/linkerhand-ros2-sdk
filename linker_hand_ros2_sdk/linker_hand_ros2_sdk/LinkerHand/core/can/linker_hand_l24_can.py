@@ -387,6 +387,11 @@ class LinkerHandL24Can:
     #     return self.x06
     # def get_fault(self):
     #     return self.x07
+
+    def clear_faults(self, finger_mask=[1, 1, 1, 1, 1]):
+        """L24 暂不支持清除故障码"""
+        pass
+    
     def close_can_interface(self):
         if self.bus:
             self.bus.shutdown()  # 关闭 CAN 总线

@@ -414,7 +414,10 @@ class LinkerHandO6Can:
     
     def get_finger_order(self):
         return ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch"]
-
+        
+    def clear_faults(self, finger_mask=[1, 1, 1, 1, 1]):
+        """O6 暂不支持清除故障码"""
+        pass
     def show_fun_table(self):
         pass
 

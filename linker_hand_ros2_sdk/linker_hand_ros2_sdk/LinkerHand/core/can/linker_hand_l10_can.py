@@ -479,6 +479,10 @@ class LinkerHandL10Can:
         return ["thumb_cmc_pitch", "thumb_cmc_yaw", "index_mcp_pitch", "middle_mcp_pitch", "ring_mcp_pitch", "pinky_mcp_pitch",
                         "index_mcp_roll", "ring_mcp_roll", "pinky_mcp_roll", "thumb_cmc_roll"]
 
+    def clear_faults(self, finger_mask=[1, 1, 1, 1, 1]):
+        """L10 暂不支持清除故障码"""
+        pass
+
     def show_fun_table(self):
         # if len(data) != 8 or data[0] != 0x64:
         #     raise ValueError("数据格式不正确")

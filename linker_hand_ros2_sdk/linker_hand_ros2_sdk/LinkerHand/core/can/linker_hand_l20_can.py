@@ -397,6 +397,7 @@ class LinkerHandL20Can:
         self.send_command(0x0d,[])
 
         return self.x09+self.x0b+self.x0c+self.x0d
+        
     def clear_faults(self):
         '''Clear motor faults'''
         self.send_command(0x07, [1, 1, 1, 1, 1])
