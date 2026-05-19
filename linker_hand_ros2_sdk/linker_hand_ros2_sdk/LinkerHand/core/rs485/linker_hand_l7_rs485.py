@@ -344,6 +344,9 @@ class LinkerHandL7RS485:
     
     def show_fun_table(self):
         pass
+
+    def clear_faults(self):
+        pass
     # --------------------------------------------------
     # 上下文管理
     # --------------------------------------------------

@@ -315,6 +315,8 @@ class LinkerHandL10RS485:
     def get_serial_number(self):
         return [0] * 6
 
+    def clear_faults(self):
+        pass
 
 # ------------------- demo -------------------
 if __name__ == "__main__":

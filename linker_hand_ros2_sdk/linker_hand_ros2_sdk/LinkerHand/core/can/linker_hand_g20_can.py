@@ -833,7 +833,7 @@ class LinkerHandG20Can:
         self.get_little_positions()
         time.sleep(0.002)
         s = [self.x41, self.x42, self.x43, self.x44, self.x45]
-        cmd_state = self.joint_state_to_cmd_state(list=s)
+        cmd_state = self.joint_state_to_cmd_state(state=s)
         return cmd_state
 
     def get_current_pub_status(self):
@@ -850,7 +850,7 @@ class LinkerHandG20Can:
         time.sleep(0.002)
 
         joint_speed = [self.x49, self.x4A, self.x4B, self.x4C, self.x4D]
-        state_speed = self.joint_state_to_cmd_state(list=joint_speed)
+        state_speed = self.joint_state_to_cmd_state(state=joint_speed)
         return state_speed
 
     def get_touch_type(self):
@@ -918,7 +918,7 @@ class LinkerHandG20Can:
         self.get_little_torque()
         time.sleep(0.003)
         t = [self.x51, self.x52, self.x53, self.x54, self.x55]
-        cmd_torque = self.joint_state_to_cmd_state(list=t)
+        cmd_torque = self.joint_state_to_cmd_state(state=t)
         return cmd_torque
 
     def get_current(self):
@@ -928,14 +928,14 @@ class LinkerHandG20Can:
     def get_temperature(self):
         """API接口:获取手指温度"""
         joint_temperature = [self.get_thumb_temperature(), self.get_index_temperature(), self.get_middle_temperature(), self.get_ring_temperature(), self.get_little_temperature()]
-        cmd_temperature = self.joint_state_to_cmd_state(list=joint_temperature)
+        cmd_temperature = self.joint_state_to_cmd_state(state=joint_temperature)
         return cmd_temperature
 
 
     def get_fault(self):
         """API接口:获取手指故障代码"""
         joint_fault = [self.get_thumb_fault(), self.get_index_fault(), self.get_middle_fault(), self.get_ring_fault(), self.get_little_fault()]
-        cmd_fault = self.joint_state_to_cmd_state(list=joint_fault)
+        cmd_fault = self.joint_state_to_cmd_state(state=joint_fault)
         return cmd_fault
 
     def clear_faults(self):
@@ -960,36 +960,56 @@ class LinkerHandG20Can:
             result.append(finger_data)
         
         return result
+    
 
-    def joint_state_to_cmd_state(self,list):
+    def joint_state_to_cmd_state(self, state):
         """
-        将手指序列状态列表转换为控制命令序列状态列表
+        将关节状态转换为命令状态
+        :param state: list2 格式的数据，5×6 的二维列表
+        :return: list1 格式的 20 维列表
         """
-        original = [""] * 20
-        try:        
-            for i, finger_data in enumerate(list):
-                # 基本位置映射
-                original[i] = finger_data[2]        # 根部
-                original[i + 5] = finger_data[0]    # 侧摆
-                original[i + 15] = finger_data[5]   # 末端
-                
-                # 特殊位置处理
-                if i == 0:  # 拇指
-                    original[10] = finger_data[1]   # 横摆
-                    original[11] = finger_data[3]   # 预留
-                    original[12] = finger_data[4]   # 预留
-                else:  # 其他手指
-                    original[10 + i] = finger_data[1]  # 预留位置
-                    if i <= 2:  # 食指、中指
-                        original[12 + i] = finger_data[3]  # 预留
-                        original[13 + i] = finger_data[4]  # 预留
-                    else:  # 无名指、小指
-                        original[11 + i] = finger_data[3]  # 预留
-                        original[12 + i] = finger_data[4]  # 预留
-            
-            return original
-        except:
-            return [-1] * 20
+        # 初始化结果列表，20个位置，预留位默认为0
+        result = [0] * 20
+        
+        # list1 索引映射:
+        # 0:拇指根部, 1:食指根部, 2:中指根部, 3:无名指根部, 4:小指根部
+        # 5:拇指侧摆, 6:食指侧摆, 7:中指侧摆, 8:无名指侧摆, 9:小指侧摆
+        # 10:拇指横摆, 11-14:预留, 15:拇指尖部, 16:食指末端, 17:中指末端, 18:无名指末端, 19:小指末端
+        
+        # list2 每行结构: [侧摆/横摆, 0, 根部, 0, 0, 末端/尖部]
+        # 拇指行: [横摆, 侧摆, 根部, 0, 0, 尖部] — 注意拇指特殊，第1列是横摆，第2列是侧摆
+        # 其他指: [侧摆, 0, 根部, 0, 0, 末端]
+        
+        # 拇指 (第0行) — 特殊处理
+        result[10] = state[0][0]   # 拇指横摆
+        result[5] = state[0][1]    # 拇指侧摆
+        result[0] = state[0][2]    # 拇指根部
+        result[15] = state[0][5]   # 拇指尖部
+        
+        # 食指 (第1行)
+        result[6] = state[1][0]    # 食指侧摆
+        result[1] = state[1][2]    # 食指根部
+        result[16] = state[1][5]   # 食指末端
+        
+        # 中指 (第2行)
+        result[7] = state[2][0]    # 中指侧摆
+        result[2] = state[2][2]    # 中指根部
+        result[17] = state[2][5]   # 中指末端
+        
+        # 无名指 (第3行)
+        result[8] = state[3][0]    # 无名指侧摆
+        result[3] = state[3][2]    # 无名指根部
+        result[18] = state[3][5]   # 无名指末端
+        
+        # 小指 (第4行)
+        result[9] = state[4][0]    # 小指侧摆
+        result[4] = state[4][2]    # 小指根部
+        result[19] = state[4][5]   # 小指末端
+        
+        # 预留位 11-14 保持为 0
+        
+        return result
+
 
     def _list_d_value(self, list1, list2):
         """检查两个列表的值是否有显著差异"""
