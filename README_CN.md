@@ -61,6 +61,17 @@ LinkerHandROS2 SDK当前支持Ubuntu22.04 ROS humble Python3.10 及以上环境
   $ [linker_hand_sdk-1] 2025-06-24 17:21:14  left L10 set maximum torque to [200, 200, 200, 200, 200]
 ```
 
+ - 启动L20 V10版(G20)全掌压感版方法
+ ```bash
+  # 开启CAN端口
+  $ sudo /usr/sbin/ip link set can0 up type can bitrate 1000000 #USB转CAN设备蓝色灯常亮状态
+  $ cd linker_hand_ros2_sdk/
+  $ colcon build --symlink-install
+  $ source ./install/setup.bash
+  # 参数说明 --hand_type 左右手  --can can端口编号  --is_touch 是否开启压感
+  $  ros2 run linker_hand_ros2_sdk linker_hand_g20_palm_touch --hand_type left --can can0 --is_touch true
+ ```
+
 ## 使用 for WIN+ROS2
 
 &ensp;&ensp; __使用前请先将 [linker_hand.launch.py](https://github.com/linker-bot/linkerhand-ros2-sdk/blob/main/linker_hand_ros2_sdk/launch/linker_hand.launch.py)文件按照实际灵巧手参数进行配置.__

@@ -27,6 +27,7 @@ DEFAULT_TORQUE = [255, 255, 255, 255, 255]
 TOUCH_SLEEP_TIME = 0.003
 
 
+
 class LinkerHandAdvancedG20(Node):
     def __init__(self, name, hand_type, can, is_touch):
         super().__init__(name)       
@@ -72,7 +73,7 @@ class LinkerHandAdvancedG20(Node):
         self._init_hand()
         time.sleep(2)
         self.count = 0
-        self.timer = self.create_timer(self.hz, self.run)  # 100 Hz
+        self.timer = self.create_timer(self.hz, self.run)  
 
 
     def _check_linker_hand_type(self):
@@ -93,7 +94,7 @@ class LinkerHandAdvancedG20(Node):
             if self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
-                self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
+                #self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
                 self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
             elif self.touch_type != -1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
@@ -108,6 +109,12 @@ class LinkerHandAdvancedG20(Node):
         time.sleep(0.1)
         self.api.finger_move(pose=DEFAULT_POSITION)
         time.sleep(0.1)
+        self.palm_touch = self.api.is_palm_touch
+        if self.palm_touch == 5:
+            self.touch_sleep_time = 0.03
+            ColorMsg(msg=f"{self.hand_type} {self.hand_joint} 全掌压感版", color="green")
+        else:
+            self.touch_sleep_time = 0.003
 
     def hand_control_cb(self, msg):
         if self.last_hand_post_cmd == None or self.list_check(msg.position) == True:
@@ -152,23 +159,25 @@ class LinkerHandAdvancedG20(Node):
         if self.is_touch == True:
             # 获取压感数据
             if self.count == 2:
-                self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
+                self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             if self.count == 4:
-                self.matrix_dic["index_matrix"] = self.api.get_index_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
+                self.matrix_dic["index_matrix"] = self.api.get_index_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             if self.count == 6:
-                self.matrix_dic["middle_matrix"] = self.api.get_middle_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
+                self.matrix_dic["middle_matrix"] = self.api.get_middle_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             if self.count == 8:
-                self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
+                self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             if self.count == 10:
-                self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=TOUCH_SLEEP_TIME).tolist()
+                self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
+            if self.count == 14 and self.palm_touch == 5:
+                self.matrix_dic["palm_matrix"] = self.api.get_palm_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             # 发布矩阵压感数据JSON格式
             self.pub_matrix_dic()
             # 发布矩阵压感和值JSON格式
             self.pub_matrix_mass(dic=self.matrix_dic)
             # 发布矩阵压感点云格式
-            self.pub_matrix_point_cloud()
+            #self.pub_matrix_point_cloud()
         self.count += 1
-        if self.count == 11:
+        if self.count == 15:
             self.count = 0
 
     def pub_matrix_dic(self):
@@ -195,33 +204,34 @@ class LinkerHandAdvancedG20(Node):
         self.matrix_mass_dic["stamp"]["secs"] = t_secs
         self.matrix_mass_dic["stamp"]["nsecs"] = t_nsecs
         self.matrix_mass_dic["unit"] = "g"
-        self.matrix_mass_dic["thumb_mass"] = sum(sum(row) for row in dic["thumb_matrix"])
-        self.matrix_mass_dic["index_mass"] = sum(sum(row) for row in dic["index_matrix"])
-        self.matrix_mass_dic["middle_mass"] = sum(sum(row) for row in dic["middle_matrix"])
-        self.matrix_mass_dic["ring_mass"] = sum(sum(row) for row in dic["ring_matrix"])
-        self.matrix_mass_dic["little_mass"] = sum(sum(row) for row in dic["little_matrix"])
+        self.matrix_mass_dic["thumb_mass"] = self.api.hand.thumb_matrix_palm_mass
+        self.matrix_mass_dic["index_mass"] = self.api.hand.index_matrix_palm_mass
+        self.matrix_mass_dic["middle_mass"] = self.api.hand.middle_matrix_palm_mass
+        self.matrix_mass_dic["ring_mass"] = self.api.hand.ring_matrix_palm_mass
+        self.matrix_mass_dic["little_mass"] = self.api.hand.little_matrix_palm_mass
+        self.matrix_mass_dic["palm_mass"] = self.api.hand.palm_matrix_palm_mass
         msg.data = json.dumps(self.matrix_mass_dic)
         self.matrix_touch_mass_pub.publish(msg)
 
-    def pub_matrix_point_cloud(self):
-        tmp_dic = self.matrix_dic.copy()
-        del tmp_dic['stamp']               # 去掉时间戳字段
-        all_matrices = list(tmp_dic.values())  # 5 帧，每帧 6×12=72 个数 or 5 帧，每帧 4×10=40 个数 列x行
-        # 摊平到一维
-        flat_list = [v for frame in all_matrices for v in frame]  
-        flat = np.concatenate([np.asarray(np.clip(c, 0, 255), dtype=np.uint8) for c in flat_list])
-        fields = [PointField(name='val', offset=0, datatype=PointField.UINT8, count=1)]
-        pc = PointCloud2()
-        pc.header.stamp =  self.get_clock().now().to_msg()
-        pc.header.frame_id = ''   # 可改成你需要的坐标系
-        pc.height = 1
-        pc.width = flat.size         # 360
-        pc.fields = fields
-        pc.is_bigendian = False
-        pc.point_step = 1            # 1 个 float32
-        pc.row_step = pc.point_step * pc.width
-        pc.data = flat.tobytes()     # 1440 字节
-        self.matrix_touch_pub_pc.publish(pc)
+    # def pub_matrix_point_cloud(self):
+    #     tmp_dic = self.matrix_dic.copy()
+    #     del tmp_dic['stamp']               # 去掉时间戳字段
+    #     all_matrices = list(tmp_dic.values())  # 5 帧，每帧 6×12=72 个数 or 5 帧，每帧 4×10=40 个数 列x行
+    #     # 摊平到一维
+    #     flat_list = [v for frame in all_matrices for v in frame]  
+    #     flat = np.concatenate([np.asarray(np.clip(c, 0, 255), dtype=np.uint8) for c in flat_list])
+    #     fields = [PointField(name='val', offset=0, datatype=PointField.UINT8, count=1)]
+    #     pc = PointCloud2()
+    #     pc.header.stamp =  self.get_clock().now().to_msg()
+    #     pc.header.frame_id = ''   # 可改成你需要的坐标系
+    #     pc.height = 1
+    #     pc.width = flat.size         # 360
+    #     pc.fields = fields
+    #     pc.is_bigendian = False
+    #     pc.point_step = 1            # 1 个 float32
+    #     pc.row_step = pc.point_step * pc.width
+    #     pc.data = flat.tobytes()     # 1440 字节
+    #     self.matrix_touch_pub_pc.publish(pc)
 
 
     def close_can(self):
@@ -236,7 +246,7 @@ def main(args=None):
     /cb_{self.hand_type}_hand_state 话题类型为 sensor_msgs/msg/JointState 30Hz
     '/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 30Hz
     启动命令:
-    ros2 run linker_hand_ros2_sdk linker_hand_advanced_g20 --hand_type left --can can0 --is_touch true
+    ros2 run linker_hand_ros2_sdk linker_hand_g20_palm_touch --hand_type left --can can0 --is_touch true
     '''
     try:
         rclpy.init(args=args)
@@ -246,13 +256,13 @@ def main(args=None):
         parser.add_argument('--is_touch',   choices=['true','false'], required=True)
 
         args = parser.parse_args()
-        node = LinkerHandAdvancedG20(name="linker_hand_advanced_g20",hand_type=args.hand_type,can=args.can,is_touch=args.is_touch)
+        node = LinkerHandAdvancedG20(name="linker_hand_g20_palm_touch",hand_type=args.hand_type,can=args.can,is_touch=args.is_touch)
         embedded_version = node.embedded_version
         rclpy.spin(node)         # 主循环，监听 ROS 回调
     except KeyboardInterrupt:
         print("收到 Ctrl+C，准备退出...")
     finally:
-        # node.close_can()         # 关闭 CAN 或其他硬件资源
+        node.close_can()         # 关闭 CAN 或其他硬件资源
         # node.destroy_node()      # 销毁 ROS 节点
         # rclpy.shutdown()         # 关闭 ROS
         print("程序已退出。")

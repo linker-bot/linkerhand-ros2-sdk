@@ -44,6 +44,7 @@ setup(
             'linker_hand_advanced_l7 = linker_hand_ros2_sdk.linker_hand_advanced_l7:main',
             'linker_hand_advanced_l10 = linker_hand_ros2_sdk.linker_hand_advanced_l10:main',
             'linker_hand_advanced_g20 = linker_hand_ros2_sdk.linker_hand_advanced_g20:main',
+            'linker_hand_g20_palm_touch = linker_hand_ros2_sdk.linker_hand_g20_palm_touch:main',
         ],
     },
 )

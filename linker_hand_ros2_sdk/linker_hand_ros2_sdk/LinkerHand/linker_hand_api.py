@@ -17,6 +17,7 @@ class LinkerHandApi:
         ColorMsg(msg=f"Current SDK version: {self.version}", color="green")
         self.hand_joint = hand_joint
         self.hand_type = hand_type
+        self.is_palm_touch = -1 # 是否为全掌压力传感器
         if self.hand_type == "left":
             self.hand_id = 0x28  # Left hand
         if self.hand_type == "right":
@@ -55,6 +56,9 @@ class LinkerHandApi:
         if self.hand_joint == "G20":
             from core.can.linker_hand_g20_can import LinkerHandG20Can
             self.hand = LinkerHandG20Can(can_id=self.hand_id,can_channel=self.can, yaml=self.yaml)
+            time.sleep(0.01)
+            self.is_palm_touch = self.hand.get_touch_sensor_type()
+            ColorMsg(msg=f"传感器类型:{self.is_palm_touch}")
         if self.hand_joint == "L21":
             from core.can.linker_hand_l21_can import LinkerHandL21Can
             self.hand = LinkerHandL21Can(can_id=self.hand_id,can_channel=self.can, yaml=self.yaml)
@@ -76,6 +80,7 @@ class LinkerHandApi:
         else:
             ColorMsg(msg=f"Embedded:{version}", color="green")
         ColorMsg(msg=f"Linker Hand Serial Number: {self.serial_number}", color="green")
+        
     
     # Five-finger movement
     def finger_move(self, pose=[]):
@@ -124,6 +129,7 @@ class LinkerHandApi:
         '''# Get approach increment'''
         self.hand.get_approach_inc()
     
+
     def set_speed(self, speed=[100]*5):
         '''# Set speed'''
         has_non_int = any(not isinstance(x, (int, float)) or x < 0 or x > 255 for x in speed)
@@ -279,6 +285,13 @@ class LinkerHandApi:
             return self.hand.get_little_matrix_touch(sleep_time=sleep_time)
         else:
             return self.hand.get_little_matrix_touch()
+        
+    def get_palm_matrix_touch(self,sleep_time=0):
+        if self.is_palm_touch == 5:
+            if sleep_time > 0:
+                return self.hand.get_palm_matrix_touch(sleep_time=sleep_time)
+            else:
+                return self.hand.get_palm_matrix_touch()
 
     def get_torque(self):
         '''Get current maximum torque'''
