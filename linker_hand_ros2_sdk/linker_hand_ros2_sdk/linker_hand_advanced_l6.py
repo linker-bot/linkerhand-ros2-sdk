@@ -238,7 +238,7 @@ def main(args=None):
         args = parser.parse_args()
         node = LinkerHandAdvancedL6(name="linker_hand_advanced_l6",hand_type=args.hand_type,can=args.can,is_touch=args.is_touch)
         embedded_version = node.embedded_version
-        if embedded_version[2] < 8:
+        if embedded_version[2] < 8 and len(embedded_version) != 3:
             ColorMsg(msg=f"固件版本过低，请升级固件到V{embedded_version[0]}.{embedded_version[1]}.8及以上版本", color="red")
             sys.exit(0)
         rclpy.spin(node)         # 主循环，监听 ROS 回调
