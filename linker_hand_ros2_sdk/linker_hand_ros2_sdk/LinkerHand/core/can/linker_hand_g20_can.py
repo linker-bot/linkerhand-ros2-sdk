@@ -1137,7 +1137,7 @@ class LinkerHandG20Can:
         self.get_thumb_torque()
         self.get_index_torque()
         self.get_middle_torque()
-        self.get_middle_torque()
+        self.get_ring_torque()
         self.get_little_torque()
         time.sleep(0.003)
         t = [self.x51, self.x52, self.x53, self.x54, self.x55]
