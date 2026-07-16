@@ -178,8 +178,8 @@ class LinkerHandL10RS485:
     # --------------------------------------------------
     def write_angles(self, vals: List[int]):
         vals = [int(x) for x in vals]
-        if not self.is_valid_10xuint8(vals):
-            raise ValueError("需要 10 个 0-255 整数")
+        #if not self.is_valid_10xuint8(vals):
+        #    raise ValueError("需要 10 个 0-255 整数")
         
         time.sleep(_INTERVAL)
         rsp = self.cli.write_registers(address=0, values=vals, slave=self.slave)
@@ -188,8 +188,8 @@ class LinkerHandL10RS485:
 
     def write_speeds(self, vals: List[int]):
         vals = [int(x) for x in vals]
-        if not self.is_valid_10xuint8(vals):
-            raise ValueError("需要 10 个 0-255 整数")
+        #if not self.is_valid_10xuint8(vals):
+        #    raise ValueError("需要 10 个 0-255 整数")
             
         time.sleep(_INTERVAL)
         rsp = self.cli.write_registers(address=20, values=vals, slave=self.slave)
@@ -198,8 +198,8 @@ class LinkerHandL10RS485:
 
     def write_torques(self, vals: List[int]):
         vals = [int(x) for x in vals]
-        if not self.is_valid_10xuint8(vals):
-            raise ValueError("需要 10 个 0-255 整数")
+        #if not self.is_valid_10xuint8(vals):
+        #    raise ValueError("需要 10 个 0-255 整数")
             
         time.sleep(_INTERVAL)
         rsp = self.cli.write_registers(address=10, values=vals, slave=self.slave)
