@@ -55,7 +55,8 @@ class LinkerHand(Node):
             "index_matrix":[[-1] * 6 for _ in range(12)],
             "middle_matrix":[[-1] * 6 for _ in range(12)],
             "ring_matrix":[[-1] * 6 for _ in range(12)],
-            "little_matrix":[[-1] * 6 for _ in range(12)]
+            "little_matrix":[[-1] * 6 for _ in range(12)],
+            "palm_matrix":[-1],
         }
         # 压感矩阵合值，单位g 克
         self.matrix_mass_dic = {
@@ -104,12 +105,12 @@ class LinkerHand(Node):
         if self.is_touch == True:
             if self.modbus != "None":
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
-                self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
+                #self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
                 self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
             elif self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
-                self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
+                #self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
                 self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
             elif self.touch_type != -1 and self.modbus == "None":
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
@@ -207,7 +208,7 @@ class LinkerHand(Node):
             if self.run_count == 3 and self.is_touch == True and self.touch_type == 1 and self.modbus == "None" and self.touch_pub.get_subscription_count() > 0:
                 """单点式压力传感器"""
                 self.force = self.api.get_force()
-            if self.is_touch == True and (self.touch_type > 1 or self.modbus != "None") and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
+            if self.is_touch == True and (self.touch_type > 1 or self.modbus != "None") and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0):
                 """矩阵式压力传感器"""
                 if self.run_count == 3:
                     self.matrix_dic["thumb_matrix"] = self.api.get_thumb_matrix_touch(sleep_time=self.sleep_time).tolist()
@@ -219,6 +220,9 @@ class LinkerHand(Node):
                     self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=self.sleep_time).tolist()
                 if self.run_count == 7:
                     self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=self.sleep_time).tolist()
+                if self.run_count == 8:
+                    if self.hand_joint == "O6":
+                        self.matrix_dic["palm_matrix"] = self.api.get_palm_matrix_touch(sleep_time=0.006)
                 time.sleep(0.005)
             if self.run_count == 8 and self.hand_info_pub.get_subscription_count() > 0:
                 """手部信息"""
@@ -251,13 +255,11 @@ class LinkerHand(Node):
                 msg = Float32MultiArray()
                 msg.data = [float(val) for sublist in self.force for val in sublist]
                 self.touch_pub.publish(msg)
-            if self.is_touch == True and (self.touch_type > 1 or self.modbus != "None") and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0 or self.matrix_touch_pub_pc.get_subscription_count() > 0):
+            if self.is_touch == True and (self.touch_type > 1 or self.modbus != "None") and (self.matrix_touch_pub.get_subscription_count() > 0 or self.matrix_touch_mass_pub.get_subscription_count() > 0):
                 # 发布矩阵压感数据JSON格式
                 self.pub_matrix_dic()
                 # 发布矩阵压感和值JSON格式
                 self.pub_matrix_mass(dic=self.matrix_dic)
-                # 发布矩阵压感点云格式
-                self.pub_matrix_point_cloud()
             if self.hand_info_pub.get_subscription_count() > 0:
                 msg = String()
                 msg.data = json.dumps(self.last_hand_info)
@@ -274,12 +276,16 @@ class LinkerHand(Node):
         t_nsecs = current_time.to_msg().nanosec
         self.matrix_mass_dic["stamp"]["secs"] = t_secs
         self.matrix_mass_dic["stamp"]["nsecs"] = t_nsecs
-        self.matrix_mass_dic["unit"] = "g"
         self.matrix_mass_dic["thumb_mass"] = sum(sum(row) for row in dic["thumb_matrix"])
         self.matrix_mass_dic["index_mass"] = sum(sum(row) for row in dic["index_matrix"])
         self.matrix_mass_dic["middle_mass"] = sum(sum(row) for row in dic["middle_matrix"])
         self.matrix_mass_dic["ring_mass"] = sum(sum(row) for row in dic["ring_matrix"])
         self.matrix_mass_dic["little_mass"] = sum(sum(row) for row in dic["little_matrix"])
+        if dic["palm_matrix"] == [-1]:
+            self.matrix_mass_dic["palm_mass"] = [-1]
+        else:
+            self.matrix_mass_dic["palm_mass"] = sum(sum(row) for row in dic["palm_matrix"])
+        self.matrix_mass_dic["unit"] = "g"
         msg.data = json.dumps(self.matrix_mass_dic)
         self.matrix_touch_mass_pub.publish(msg)
 

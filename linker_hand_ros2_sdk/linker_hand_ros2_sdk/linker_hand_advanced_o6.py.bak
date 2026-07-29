@@ -83,6 +83,7 @@ class LinkerHandAdvancedO6(Node):
             if self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
+                self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
                 self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
             elif self.touch_type != -1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
@@ -157,12 +158,12 @@ class LinkerHandAdvancedO6(Node):
             self.matrix_dic["middle_matrix"] = self.api.get_middle_matrix_touch(sleep_time=0.002).tolist()
             self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=0.002).tolist()
             self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=0.002).tolist()
-            self.matrix_dic["palm_matrix"] = self.api.get_palm_matrix_touch(sleep_time=0.006)
             # 发布矩阵压感数据JSON格式
             self.pub_matrix_dic()
             # 发布矩阵压感和值JSON格式
             self.pub_matrix_mass(dic=self.matrix_dic)
-
+            # 发布矩阵压感点云格式
+            self.pub_matrix_point_cloud()
     
     def pub_matrix_dic(self):
         """发布矩阵数据JSON格式"""
@@ -187,16 +188,12 @@ class LinkerHandAdvancedO6(Node):
         t_nsecs = current_time.to_msg().nanosec
         self.matrix_mass_dic["stamp"]["secs"] = t_secs
         self.matrix_mass_dic["stamp"]["nsecs"] = t_nsecs
+        self.matrix_mass_dic["unit"] = "g"
         self.matrix_mass_dic["thumb_mass"] = sum(sum(row) for row in dic["thumb_matrix"])
         self.matrix_mass_dic["index_mass"] = sum(sum(row) for row in dic["index_matrix"])
         self.matrix_mass_dic["middle_mass"] = sum(sum(row) for row in dic["middle_matrix"])
         self.matrix_mass_dic["ring_mass"] = sum(sum(row) for row in dic["ring_matrix"])
         self.matrix_mass_dic["little_mass"] = sum(sum(row) for row in dic["little_matrix"])
-        if dic["palm_matrix"] == [-1]:
-            self.matrix_mass_dic["palm_mass"] = [-1]
-        else:
-            self.matrix_mass_dic["palm_mass"] = sum(sum(row) for row in dic["palm_matrix"])
-        self.matrix_mass_dic["unit"] = "g"
         msg.data = json.dumps(self.matrix_mass_dic)
         self.matrix_touch_mass_pub.publish(msg)
 
@@ -233,7 +230,7 @@ def main(args=None):
     /cb_{self.hand_type}_hand_state 话题类型为 sensor_msgs/msg/JointState 50Hz
     '/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 50Hz
     启动命令:
-    ros2 run linker_hand_ros2_sdk linker_hand_advanced_o6 --hand_type left --can can0 --is_touch true
+    ros2 run linker_hand_ros2_sdk linker_hand_advanced_o6 --hand_type right --can can0 --is_touch true
     '''
     try:
         rclpy.init(args=args)

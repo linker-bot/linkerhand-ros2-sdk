@@ -213,7 +213,27 @@ class HandControlGUI(QWidget):
         """初始化用户界面"""
         # 设置窗口属性
         self.setWindowTitle(f'灵巧手控制界面 - {self.hand_type} {self.hand_joint}')
-        self.setMinimumSize(1200, 900)
+
+        # 根据当前显示器分辨率进行缩放适配：
+        # 在大屏上使用首选尺寸(1200x900)，在小屏上按可用区域比例收缩，避免窗口超出屏幕
+        screen = QApplication.primaryScreen()
+        avail = screen.availableGeometry() if screen else None
+        if avail:
+            pref_w, pref_h = 1200, 900
+            target_w = min(pref_w, int(avail.width() * 0.85))
+            target_h = min(pref_h, int(avail.height() * 0.85))
+            # 最小尺寸也随屏幕收缩，保证在小分辨率显示器上仍可完整显示
+            min_w = min(pref_w, int(avail.width() * 0.6))
+            min_h = min(pref_h, int(avail.height() * 0.6))
+            self.setMinimumSize(min_w, min_h)
+            self.resize(target_w, target_h)
+            # 将窗口居中显示
+            self.move(
+                avail.left() + (avail.width() - target_w) // 2,
+                avail.top() + (avail.height() - target_h) // 2,
+            )
+        else:
+            self.setMinimumSize(1200, 900)
         
         # 设置样式
         self.setStyleSheet("""
@@ -777,7 +797,11 @@ def main(args=None):
     try:
         # 创建ROS2节点管理器
         ros_manager = ROS2NodeManager()
-        
+
+        # 启用高分辨率(HiDPI)缩放适配，必须在创建 QApplication 之前设置
+        QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+        QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
         # 创建Qt应用
         app = QApplication(sys.argv)
         

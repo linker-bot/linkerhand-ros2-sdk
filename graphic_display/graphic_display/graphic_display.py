@@ -13,15 +13,37 @@ from typing import Dict, List
 
 from linker_hand_ros2_sdk.LinkerHand.utils.init_linker_hand import InitLinkerHand
 
+
+def scaled_window_geometry(index: int = 0, base_w: int = 800, base_h: int = 400):
+    """根据当前显示器可用区域计算窗口几何尺寸，实现多分辨率缩放适配。
+
+    在大屏上使用首选尺寸(base_w x base_h)，在小屏上按可用区域比例收缩，
+    并按窗口序号做少量偏移，避免多个窗口完全重叠。
+    """
+    screen = QtWidgets.QApplication.primaryScreen()
+    if screen is None:
+        return 100 + index * 50, 100 + index * 50, base_w, base_h
+    avail = screen.availableGeometry()
+    w = min(base_w, int(avail.width() * 0.6))
+    h = min(base_h, int(avail.height() * 0.6))
+    x = avail.left() + 60 + index * 40
+    y = avail.top() + 60 + index * 40
+    # 保证偏移后窗口仍在可用区域内
+    x = min(x, avail.right() - w)
+    y = min(y, avail.bottom() - h)
+    return x, y, w, h
+
+
 class ForceGroupWindow(QtWidgets.QMainWindow):
     """专用力传感器组可视化窗口"""
     def __init__(self, group_id: int):
         super().__init__()
         self.setWindowTitle(f"Force Sensor Group {group_id+1}")
-        self.setGeometry(100 + group_id*50, 100 + group_id*50, 800, 400)
+        self.setGeometry(*scaled_window_geometry(group_id))
         
-        # 图形设置
-        self.canvas = FigureCanvasQTAgg(Figure(figsize=(8, 4)))
+        # 图形设置：使用 constrained 布局，随窗口/分辨率自动调整边距，
+        # 避免标题、坐标轴标签和图例在不同缩放下被裁剪
+        self.canvas = FigureCanvasQTAgg(Figure(figsize=(8, 4), layout='constrained'))
         self.setCentralWidget(self.canvas)
         self.ax = self.canvas.figure.add_subplot(111)
         self.ax.set_title(f'Force Group {group_id+1} (5 channels)')
@@ -79,6 +101,9 @@ class HandMonitor(Node):
         super().__init__('graphic_display')
         
         # 初始化Qt应用
+        # 启用高分辨率(HiDPI)缩放适配，必须在创建 QApplication 之前设置
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
+        QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
         self.app = QtWidgets.QApplication(sys.argv)
         
         # 窗口管理
@@ -215,10 +240,10 @@ class DataPlotWindow(QtWidgets.QMainWindow):
     def __init__(self, title: str, ylabel: str, channel_count: int, y_range: tuple):
         super().__init__()
         self.setWindowTitle(title)
-        self.setGeometry(100, 100, 800, 400)
+        self.setGeometry(*scaled_window_geometry())
         
-        # 图形设置
-        self.canvas = FigureCanvasQTAgg(Figure(figsize=(8, 4)))
+        # 图形设置：使用 constrained 布局，为外置图例预留空间，避免被裁剪
+        self.canvas = FigureCanvasQTAgg(Figure(figsize=(8, 4), layout='constrained'))
         self.setCentralWidget(self.canvas)
         self.ax = self.canvas.figure.add_subplot(111)
         self.ax.set_title(title)
