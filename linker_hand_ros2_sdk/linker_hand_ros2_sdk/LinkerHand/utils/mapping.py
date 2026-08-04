@@ -86,7 +86,7 @@ def range_to_arc_left(left_range,hand_joint):
         l_min = l10_l_min
         l_max = l10_l_max
         l_derict = l10_l_derict
-    elif hand_joint == "L20":
+    elif hand_joint == "L20" or hand_joint == "G20":
         num = 20
         l_min = l20_l_min
         l_max = l20_l_max
@@ -98,7 +98,7 @@ def range_to_arc_left(left_range,hand_joint):
         l_derict = l21_l_derict
     hand_arc = [0] * num
     for i in range(num):
-        if hand_joint == "L20":
+        if hand_joint == "L20" or hand_joint == "G20":
             if 11 <= i <= 14: continue
         if hand_joint == "L21":
             if 11 <= i <= 14: continue
@@ -132,7 +132,7 @@ def range_to_arc_right(right_range,hand_joint):
         r_min = l10_r_min
         r_max = l10_r_max
         r_derict = l10_r_derict
-    elif hand_joint == "L20":
+    elif hand_joint == "L20" or hand_joint == "G20":
         num = 20
         r_min = l20_r_min
         r_max = l20_r_max
@@ -144,7 +144,7 @@ def range_to_arc_right(right_range,hand_joint):
         r_derict = l21_r_derict
     hand_arc = [0] * num
     for i in range(num):
-        if hand_joint == "L20":
+        if hand_joint == "L20" or hand_joint == "G20":
             if 11 <= i <= 14: continue
         if hand_joint == "L21":
             if 11 <= i <= 14: continue
@@ -210,7 +210,7 @@ def arc_to_range_left(hand_arc_l,hand_joint):
         l_min = l10_l_min
         l_max = l10_l_max
         l_derict = l10_l_derict
-    elif hand_joint == "L20":
+    elif hand_joint == "L20" or hand_joint == "G20":
         num = 20
         l_min = l20_l_min
         l_max = l20_l_max
@@ -223,7 +223,7 @@ def arc_to_range_left(hand_arc_l,hand_joint):
     hand_range = [0] * num
     #hand_range_l = [0] * 7
     for i in range(num):
-        if hand_joint == "L20":
+        if hand_joint == "L20" or hand_joint == "G20":
             if 11 <= i <= 14: continue
         if hand_joint == "L21":
             if 11 <= i <= 14: continue
@@ -253,7 +253,7 @@ def arc_to_range_right(right_arc,hand_joint):
         r_min = l10_r_min
         r_max = l10_r_max
         r_derict = l10_r_derict
-    elif hand_joint == "L20":
+    elif hand_joint == "L20" or hand_joint == "G20":
         num = 20
         r_min = l20_r_min
         r_max = l20_r_max
@@ -265,7 +265,7 @@ def arc_to_range_right(right_arc,hand_joint):
         r_derict = l21_r_derict
     hand_range = [0] * num
     for i in range(num):
-        if hand_joint == "L20":
+        if hand_joint == "L20" or hand_joint == "G20":
             if 11 <= i <= 14: continue
         if hand_joint == "L21":
             if 11 <= i <= 14: continue

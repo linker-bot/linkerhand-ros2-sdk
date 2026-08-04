@@ -386,7 +386,7 @@ class LinkerHandO6Can:
         return self.version
 
     def get_current_status(self):
-        self.send_frame(0x01, [],sleep=0.005)
+        self.send_frame(0x01, [],sleep=0.003)
         return self.x01
         
     def get_current_pub_status(self):
@@ -399,14 +399,14 @@ class LinkerHandO6Can:
 
     def get_current(self):
         '''Not supported yet.'''
-        self.send_frame(0x36, [],sleep=0.005)
+        self.send_frame(0x36, [],sleep=0.003)
         return self.x36
 
 
 
     def get_torque(self):
         '''Not supported yet.'''
-        self.send_frame(0x2, [],sleep=0.01)
+        self.send_frame(0x2, [],sleep=0.005)
         return self.x02
 
     def get_touch_type(self):

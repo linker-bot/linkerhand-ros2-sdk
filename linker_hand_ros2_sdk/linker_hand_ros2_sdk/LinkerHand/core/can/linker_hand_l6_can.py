@@ -309,8 +309,9 @@ class LinkerHandL6Can:
 
     def get_torque(self):
         '''Not supported yet.'''
-        self.send_frame(0x2, [],sleep=0.01)
-        return self.x02
+        #self.send_frame(0x2, [],sleep=0.003)
+        #return self.x02
+        return self.get_current()
 
     def get_touch_type(self):
         '''Get touch type'''

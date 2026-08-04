@@ -120,7 +120,7 @@ class LinkerHandAdvancedL6(Node):
             return False
         return any(abs(self.last_hand_post_cmd - pose) >= 3 for self.last_hand_post_cmd, pose in zip(self.last_hand_post_cmd, pose))
     
-    def joint_state_msg(self, pose,vel=[]):
+    def joint_state_msg(self, pose,vel=[],eff=[]):
         joint_state = JointState()
         joint_state.header = Header()
         joint_state.header.stamp = self.get_clock().now().to_msg()
@@ -130,7 +130,10 @@ class LinkerHandAdvancedL6(Node):
             joint_state.velocity = [float(x) for x in vel]
         else:
             joint_state.velocity = [0.0] * len(pose)
-        joint_state.effort = [0.0] * len(pose)
+        if len(eff) > 1:
+            joint_state.effort = [float(x) for x in eff]
+        else:
+            joint_state.effort = [0.0] * len(pose)
         return joint_state
 
     def run(self):
@@ -142,8 +145,9 @@ class LinkerHandAdvancedL6(Node):
         # 优先获取手指状态并且发布
         self.last_hand_state = self.api.get_state()
         self.last_hand_vel = self.api.get_joint_speed()
+        self.last_hand_eff = self.api.get_torque()
         # 发布手状态
-        msg_state = self.joint_state_msg(self.last_hand_state, self.last_hand_vel)
+        msg_state = self.joint_state_msg(self.last_hand_state, self.last_hand_vel, self.last_hand_eff)
         self.hand_state_pub.publish(msg_state)
         time.sleep(0.002)
         # 获取压感数据
@@ -226,7 +230,7 @@ def main(args=None):
     /cb_{self.hand_type}_hand_state 话题类型为 sensor_msgs/msg/JointState 40Hz
     '/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 40Hz
     启动命令:
-    ros2 run linker_hand_ros2_sdk linker_hand_advanced_l6 --hand_type left --can can0 --is_touch true
+    ros2 run linker_hand_ros2_sdk linker_hand_advanced_l6 --hand_type right --can can0 --is_touch true
     '''
     try:
         rclpy.init(args=args)
