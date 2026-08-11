@@ -287,7 +287,7 @@ class LinkerHandApi:
             return self.hand.get_little_matrix_touch()
         
     def get_palm_matrix_touch(self,sleep_time=0):
-        if self.hand_joint == "O6":
+        if self.hand_joint == "O6" or self.hand_joint == "L6":
             if sleep_time > 0:
                 return self.hand.get_palm_matrix_touch(sleep_time=sleep_time)
             else:

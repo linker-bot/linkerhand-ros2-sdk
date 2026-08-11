@@ -84,7 +84,6 @@ class LinkerHandAdvancedL6(Node):
             if self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
                 self.matrix_touch_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch', 10)
-                self.matrix_touch_pub_pc = self.create_publisher(PointCloud2, f'/cb_{self.hand_type}_hand_matrix_touch_pc', 10)
                 self.matrix_touch_mass_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_matrix_touch_mass', 10)
             elif self.touch_type != -1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with pressure sensor", color="green")
@@ -157,12 +156,11 @@ class LinkerHandAdvancedL6(Node):
             self.matrix_dic["middle_matrix"] = self.api.get_middle_matrix_touch(sleep_time=0.003).tolist()
             self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=0.003).tolist()
             self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=0.003).tolist()
+            self.matrix_dic["palm_matrix"] = self.api.get_palm_matrix_touch(sleep_time=0.006)
             # 发布矩阵压感数据JSON格式
             self.pub_matrix_dic()
             # 发布矩阵压感和值JSON格式
             self.pub_matrix_mass(dic=self.matrix_dic)
-            # 发布矩阵压感点云格式
-            self.pub_matrix_point_cloud()
     
     def pub_matrix_dic(self):
         """发布矩阵数据JSON格式"""
@@ -193,30 +191,12 @@ class LinkerHandAdvancedL6(Node):
         self.matrix_mass_dic["middle_mass"] = sum(sum(row) for row in dic["middle_matrix"])
         self.matrix_mass_dic["ring_mass"] = sum(sum(row) for row in dic["ring_matrix"])
         self.matrix_mass_dic["little_mass"] = sum(sum(row) for row in dic["little_matrix"])
+        if dic["palm_matrix"] == [-1]:
+            self.matrix_mass_dic["palm_mass"] = [-1]
+        else:
+            self.matrix_mass_dic["palm_mass"] = sum(sum(row) for row in dic["palm_matrix"])
         msg.data = json.dumps(self.matrix_mass_dic)
         self.matrix_touch_mass_pub.publish(msg)
-
-    def pub_matrix_point_cloud(self):
-        tmp_dic = self.matrix_dic.copy()
-        del tmp_dic['stamp']               # 去掉时间戳字段
-        all_matrices = list(tmp_dic.values())  # 5 帧，每帧 6×12=72 个数 or 5 帧，每帧 4×10=40 个数 列x行
-        # 摊平到一维
-        flat_list = [v for frame in all_matrices for v in frame]  
-        flat = np.concatenate([np.asarray(np.clip(c, 0, 255), dtype=np.uint8) for c in flat_list])
-        fields = [PointField(name='val', offset=0, datatype=PointField.UINT8, count=1)]
-        pc = PointCloud2()
-        pc.header.stamp =  self.get_clock().now().to_msg()
-        pc.header.frame_id = ''   # 可改成你需要的坐标系
-        pc.height = 1
-        pc.width = flat.size         # 360
-        pc.fields = fields
-        pc.is_bigendian = False
-        pc.point_step = 1            # 1 个 float32
-        pc.row_step = pc.point_step * pc.width
-        pc.data = flat.tobytes()     # 1440 字节
-        self.matrix_touch_pub_pc.publish(pc)
-
-
 
     def close_can(self):
         self.api.open_can.close_can(can=self.can)

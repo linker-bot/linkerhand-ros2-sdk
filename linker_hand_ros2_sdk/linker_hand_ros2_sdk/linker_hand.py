@@ -221,7 +221,7 @@ class LinkerHand(Node):
                 if self.run_count == 7:
                     self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=self.sleep_time).tolist()
                 if self.run_count == 8:
-                    if self.hand_joint == "O6":
+                    if self.hand_joint == "O6" or self.hand_joint == "L6":
                         self.matrix_dic["palm_matrix"] = self.api.get_palm_matrix_touch(sleep_time=0.006)
                 time.sleep(0.005)
             if self.run_count == 8 and self.hand_info_pub.get_subscription_count() > 0:
