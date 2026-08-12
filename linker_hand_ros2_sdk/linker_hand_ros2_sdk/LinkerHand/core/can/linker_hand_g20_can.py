@@ -159,6 +159,7 @@ class FrameProperty(Enum):
 class LinkerHandG20Can:
     def __init__(self, can_channel='can0', baudrate=1000000, can_id=0x28, yaml=""):
         self.can_id = can_id
+        #self.can_id = 0x01
         self.can_channel = can_channel
         self.baudrate = baudrate
         self.open_can = OpenCan(load_yaml=yaml)
@@ -1146,7 +1147,20 @@ class LinkerHandG20Can:
 
     def get_current(self):
         """API接口:获取手指电流"""
-        return [-1] * 20
+        # ROLL_TORQUE = 0x11  # 横滚关节扭矩
+        # YAW_TORQUE = 0x12  # 航向关节扭矩
+        # ROOT1_TORQUE = 0x13  # 指根1关节扭矩
+        # ROOT2_TORQUE = 0x14  # 指根2关节扭矩
+        # ROOT3_TORQUE = 0x15  # 指根3关节扭矩
+        # TIP_TORQUE = 0x16  # 指尖关节扭矩
+        self.send_command(FrameProperty.ROLL_TORQUE, [])
+        self.send_command(FrameProperty.YAW_TORQUE, [])
+        self.send_command(FrameProperty.ROOT1_TORQUE, [])
+        self.send_command(FrameProperty.ROOT2_TORQUE, [])
+        self.send_command(FrameProperty.ROOT3_TORQUE, [])
+        self.send_command(FrameProperty.TIP_TORQUE, [])
+
+        return [self.x11, self.x12, self.x13, self.x14, self.x15, self.x16]
 
     def get_temperature(self):
         """API接口:获取手指温度"""
