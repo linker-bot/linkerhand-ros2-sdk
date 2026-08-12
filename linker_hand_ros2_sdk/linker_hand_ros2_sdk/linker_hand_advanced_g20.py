@@ -89,6 +89,8 @@ class LinkerHandAdvancedG20(Node):
         self.touch_type = self.api.get_touch_type()
         self.hand_cmd_sub = self.create_subscription(JointState, f'/cb_{self.hand_type}_hand_control_cmd', self.hand_control_cb,10)
         self.hand_state_pub = self.create_publisher(JointState, f'/cb_{self.hand_type}_hand_state',10)
+        # G20电机实时电流。由于电机顺序不同，G20独有
+        self.hand_current_pub = self.create_publisher(String, f'/cb_{self.hand_type}_hand_current',10)
         if self.is_touch == True:
             if self.touch_type > 1:
                 ColorMsg(msg=f"{self.hand_type} {self.hand_joint} Equipped with matrix pressure sensing", color='green')
@@ -124,7 +126,7 @@ class LinkerHandAdvancedG20(Node):
             return False
         return any(abs(self.last_hand_post_cmd - pose) >= 3 for self.last_hand_post_cmd, pose in zip(self.last_hand_post_cmd, pose))
     
-    def joint_state_msg(self, pose,vel=[]):
+    def joint_state_msg(self, pose,vel=[],eff=[]):
         joint_state = JointState()
         joint_state.header = Header()
         joint_state.header.stamp = self.get_clock().now().to_msg()
@@ -134,7 +136,10 @@ class LinkerHandAdvancedG20(Node):
             joint_state.velocity = [float(x) for x in vel]
         else:
             joint_state.velocity = [0.0] * len(pose)
-        joint_state.effort = [0.0] * len(pose)
+        if len(eff) > 1:
+            joint_state.effort = [float(x) for x in eff]
+        else:
+            joint_state.effort = [0.0] * len(pose)
         return joint_state
 
     def run(self):
@@ -144,11 +149,21 @@ class LinkerHandAdvancedG20(Node):
             self.last_hand_post_cmd = None
         # 优先获取手指状态并且发布
         self.last_hand_state = self.api.get_state()
-        self.last_hand_vel = [0.0] * len(self.last_hand_state)
+        self.last_hand_vel = self.api.get_speed()
+        self.last_hand_eff = self.api.get_torque()
+        current = {
+            "names":["横滚关节扭矩","航向关节扭矩","指根1关节扭矩","指根2关节扭矩","指根3关节扭矩","指尖关节扭矩"],
+            "currents":self.api.get_current()
+        }
         # 发布手状态
-        msg_state = self.joint_state_msg(self.last_hand_state, self.last_hand_vel)
+        msg_state = self.joint_state_msg(self.last_hand_state, self.last_hand_vel, self.last_hand_eff)
         self.hand_state_pub.publish(msg_state)
-        
+
+        # 发布手电流
+        msg_current = String()
+        msg_current.data = json.dumps(current, ensure_ascii=False)
+        self.hand_current_pub.publish(msg_current)
+
         if self.is_touch == True:
             # 获取压感数据
             if self.count == 2:
@@ -236,7 +251,7 @@ def main(args=None):
     /cb_{self.hand_type}_hand_state 话题类型为 sensor_msgs/msg/JointState 30Hz
     '/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 30Hz
     启动命令:
-    ros2 run linker_hand_ros2_sdk linker_hand_advanced_g20 --hand_type left --can can0 --is_touch true
+    ros2 run linker_hand_ros2_sdk linker_hand_advanced_g20 --hand_type right --can can0 --is_touch true
     '''
     try:
         rclpy.init(args=args)
