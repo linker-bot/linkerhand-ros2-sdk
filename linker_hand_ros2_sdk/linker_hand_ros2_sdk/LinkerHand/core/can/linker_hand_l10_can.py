@@ -69,12 +69,13 @@ class LinkerHandL10Can:
             176: 11,
         }
         self.serial_number = []
-        self.serial_number_map = {
-            0: 0,
-            1: 1,
-            2: 2,
-            3: 3,
-        }
+        # self.serial_number_map = {
+        #     0: 0,
+        #     1: 1,
+        #     2: 2,
+        #     3: 3,
+        # }
+        self.serial_number_map = {0: 0, 6: 6, 12: 12, 18: 18}
         self.can_id = can_id
         self.joint_angles = [0] * 10
         self.pressures = [200] * 5  # Default torque 200
@@ -433,7 +434,7 @@ class LinkerHandL10Can:
         self.send_frame(0xb5,[0xc6],sleep=sleep_time)
         return self.little_matrix
 
-
+    """
     def get_torque(self):
         '''Get current motor torque'''
         if self.version != None and self.version[4]< 36:
@@ -444,6 +445,15 @@ class LinkerHandL10Can:
             self.send_frame(0x03,[])
             time.sleep(0.002)
             return self.x02+self.x03
+    """
+
+    def get_torque(self):
+        '''Get current motor torque'''
+        self.send_frame(0x02, [])
+        time.sleep(0.002)
+        self.send_frame(0x03,[])
+        time.sleep(0.002)
+        return self.x02+self.x03
     
     def get_fault(self):
         '''Get motor fault'''
