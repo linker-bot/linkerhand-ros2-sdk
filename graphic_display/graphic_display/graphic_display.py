@@ -14,43 +14,217 @@ from typing import Dict, List
 from linker_hand_ros2_sdk.LinkerHand.utils.init_linker_hand import InitLinkerHand
 
 
-def scaled_window_geometry(index: int = 0, base_w: int = 800, base_h: int = 400):
+# ---------------------------------------------------------------------------
+# 显示器缩放适配：DPI(像素密度) / 逻辑分辨率 / 窗口尺寸 三个维度
+# ---------------------------------------------------------------------------
+BASE_DPI = 96.0             # 设计基准 DPI
+BASE_SCREEN_W = 1920.0      # 设计基准逻辑分辨率
+BASE_SCREEN_H = 1080.0
+BASE_WINDOW_W = 800.0       # 设计基准窗口尺寸(逻辑像素)
+BASE_WINDOW_H = 400.0
+
+# 基准字号(pt)与线宽，实际显示值 = 基准值 * 缩放系数
+BASE_FONT_SIZES = {
+    'title': 12.0,
+    'label': 10.0,
+    'tick': 9.0,
+    'legend': 9.0,
+}
+BASE_LINE_WIDTH = 1.5
+
+
+def _current_screen(widget=None):
+    """获取窗口当前所在的显示器，取不到时回退到主显示器。"""
+    app = QtWidgets.QApplication.instance()
+    if app is None:
+        return None
+    if widget is not None:
+        handle = widget.windowHandle()
+        if handle is not None and handle.screen() is not None:
+            return handle.screen()
+        # Qt >= 5.10 才有 screenAt
+        if hasattr(QtWidgets.QApplication, 'screenAt'):
+            screen = QtWidgets.QApplication.screenAt(widget.geometry().center())
+            if screen is not None:
+                return screen
+    return QtWidgets.QApplication.primaryScreen()
+
+
+def screen_dpi(widget=None) -> float:
+    """当前显示器的逻辑 DPI，用于设置 matplotlib 图形 DPI。
+
+    matplotlib 的字号、线宽都以 pt 为单位，图形 DPI 跟随显示器后，
+    文字与线条在高分屏上才会等比放大而不是变小、发虚。
+    """
+    screen = _current_screen(widget)
+    if screen is None:
+        return BASE_DPI
+    dpi = float(screen.logicalDotsPerInch())
+    if dpi <= 0:
+        return BASE_DPI
+    # 限幅，避免异常 DPI 造成图形过大/过小
+    return max(BASE_DPI * 0.75, min(dpi, BASE_DPI * 3.0))
+
+
+def screen_size_scale(widget=None) -> float:
+    """逻辑分辨率相对基准(1920x1080)的尺寸缩放系数。
+
+    小屏(如 1366x768)返回 <1 让文字收缩以免挤占绘图区，
+    大屏返回 >1 让文字不至于过小。DPI 缩放已由 screen_dpi 处理，
+    此处只负责"屏幕物理可用空间"这一维度，两者不重复叠加。
+    """
+    screen = _current_screen(widget)
+    if screen is None:
+        return 1.0
+    avail = screen.availableGeometry()
+    scale = min(avail.width() / BASE_SCREEN_W, avail.height() / BASE_SCREEN_H)
+    return max(0.75, min(scale, 1.6))
+
+
+def scaled_window_geometry(index: int = 0, base_w: int = int(BASE_WINDOW_W),
+                           base_h: int = int(BASE_WINDOW_H)):
     """根据当前显示器可用区域计算窗口几何尺寸，实现多分辨率缩放适配。
 
-    在大屏上使用首选尺寸(base_w x base_h)，在小屏上按可用区域比例收缩，
-    并按窗口序号做少量偏移，避免多个窗口完全重叠。
+    大屏上按 screen_size_scale 放大首选尺寸(base_w x base_h)，
+    小屏上按可用区域比例收缩，并按窗口序号做少量偏移避免完全重叠。
     """
     screen = QtWidgets.QApplication.primaryScreen()
     if screen is None:
         return 100 + index * 50, 100 + index * 50, base_w, base_h
     avail = screen.availableGeometry()
-    w = min(base_w, int(avail.width() * 0.6))
-    h = min(base_h, int(avail.height() * 0.6))
-    x = avail.left() + 60 + index * 40
-    y = avail.top() + 60 + index * 40
+    scale = screen_size_scale()
+    w = min(int(base_w * scale), int(avail.width() * 0.6))
+    h = min(int(base_h * scale), int(avail.height() * 0.6))
+    step = int(40 * scale)
+    x = avail.left() + int(60 * scale) + index * step
+    y = avail.top() + int(60 * scale) + index * step
     # 保证偏移后窗口仍在可用区域内
     x = min(x, avail.right() - w)
     y = min(y, avail.bottom() - h)
     return x, y, w, h
 
 
-class ForceGroupWindow(QtWidgets.QMainWindow):
-    """专用力传感器组可视化窗口"""
-    def __init__(self, group_id: int):
+def apply_app_scaling(app) -> float:
+    """按显示器缩放 Qt 默认字体与 matplotlib 全局样式，返回缩放系数。
+
+    需在 QApplication 创建之后调用。
+    """
+    scale = screen_size_scale()
+    font = app.font()
+    pt = font.pointSizeF()
+    if pt <= 0:
+        pt = 9.0
+    font.setPointSizeF(round(pt * scale, 1))
+    app.setFont(font)
+
+    dpi = screen_dpi()
+    matplotlib.rcParams.update({
+        'figure.dpi': dpi,
+        'font.size': BASE_FONT_SIZES['tick'] * scale,
+        'axes.titlesize': BASE_FONT_SIZES['title'] * scale,
+        'axes.labelsize': BASE_FONT_SIZES['label'] * scale,
+        'xtick.labelsize': BASE_FONT_SIZES['tick'] * scale,
+        'ytick.labelsize': BASE_FONT_SIZES['tick'] * scale,
+        'legend.fontsize': BASE_FONT_SIZES['legend'] * scale,
+        'lines.linewidth': BASE_LINE_WIDTH * scale,
+    })
+    return scale
+
+
+class ScaledPlotWindow(QtWidgets.QMainWindow):
+    """带显示器缩放适配的绘图窗口基类。
+
+    适配三件事：
+      1. 窗口几何 —— 按显示器可用区域缩放(scaled_window_geometry)
+      2. 图形 DPI —— 跟随所在显示器，HiDPI 下图形清晰且物理尺寸一致
+      3. 文字/线宽 —— 随显示器分辨率与当前窗口大小自适应，缩小窗口时
+         标题、刻度、图例同步变小，不会挤掉绘图区
+    子类在 super().__init__() 之后即可使用 self.canvas / self.ax。
+    """
+
+    def __init__(self, window_index: int = 0):
         super().__init__()
-        self.setWindowTitle(f"Force Sensor Group {group_id+1}")
-        self.setGeometry(*scaled_window_geometry(group_id))
-        
-        # 图形设置：使用 constrained 布局，随窗口/分辨率自动调整边距，
-        # 避免标题、坐标轴标签和图例在不同缩放下被裁剪
-        self.canvas = FigureCanvasQTAgg(Figure(figsize=(8, 4), layout='constrained'))
+        self._size_scale = screen_size_scale()
+        self._screen_hooked = False
+        self.setGeometry(*scaled_window_geometry(window_index))
+        # 最小尺寸同样缩放，避免高分屏上窗口被缩到无法阅读
+        self.setMinimumSize(int(360 * self._size_scale), int(240 * self._size_scale))
+
+        # 图形设置：DPI 跟随显示器；使用 constrained 布局，随窗口/分辨率
+        # 自动调整边距，避免标题、坐标轴标签和图例在不同缩放下被裁剪
+        dpi = screen_dpi()
+        self.canvas = FigureCanvasQTAgg(Figure(
+            figsize=(BASE_WINDOW_W * self._size_scale / dpi,
+                     BASE_WINDOW_H * self._size_scale / dpi),
+            dpi=dpi,
+            layout='constrained'))
         self.setCentralWidget(self.canvas)
         self.ax = self.canvas.figure.add_subplot(111)
+        self.ax.grid(True)
+
+    # ---- 缩放适配 ----------------------------------------------------
+    def _text_scale(self) -> float:
+        """显示器系数 x 窗口相对基准尺寸的系数(限幅)。"""
+        w = max(self.canvas.width(), 1)
+        h = max(self.canvas.height(), 1)
+        rel = min(w / (BASE_WINDOW_W * self._size_scale),
+                  h / (BASE_WINDOW_H * self._size_scale))
+        rel = max(0.65, min(rel, 1.8))
+        # 两个系数相乘后再次限幅：下限保证小屏小窗口时文字仍可读，
+        # 上限避免大屏最大化时文字过大挤占绘图区
+        return max(0.8, min(self._size_scale * rel, 2.0))
+
+    def apply_text_scale(self):
+        """把当前缩放系数应用到标题、坐标轴、刻度、图例和线宽。"""
+        s = self._text_scale()
+        self.ax.title.set_fontsize(BASE_FONT_SIZES['title'] * s)
+        self.ax.xaxis.label.set_fontsize(BASE_FONT_SIZES['label'] * s)
+        self.ax.yaxis.label.set_fontsize(BASE_FONT_SIZES['label'] * s)
+        self.ax.tick_params(axis='both', labelsize=BASE_FONT_SIZES['tick'] * s,
+                            width=0.8 * s, length=3.5 * s)
+        for line in self.ax.get_lines():
+            line.set_linewidth(BASE_LINE_WIDTH * s)
+        for spine in self.ax.spines.values():
+            spine.set_linewidth(0.8 * s)
+        legend = self.ax.get_legend()
+        if legend is not None:
+            for text in legend.get_texts():
+                text.set_fontsize(BASE_FONT_SIZES['legend'] * s)
+            frame = legend.get_frame()
+            if frame is not None:
+                frame.set_linewidth(0.8 * s)
+        self.canvas.draw_idle()
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.apply_text_scale()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        handle = self.windowHandle()
+        if handle is not None and not self._screen_hooked:
+            # 窗口被拖到另一台显示器时重新适配
+            handle.screenChanged.connect(self._on_screen_changed)
+            self._screen_hooked = True
+        self.apply_text_scale()
+
+    def _on_screen_changed(self, *_):
+        """跨显示器移动后重算 DPI 与字号(混合分辨率多屏场景)。"""
+        self._size_scale = screen_size_scale(self)
+        self.canvas.figure.set_dpi(screen_dpi(self))
+        self.setMinimumSize(int(360 * self._size_scale), int(240 * self._size_scale))
+        self.apply_text_scale()
+
+
+class ForceGroupWindow(ScaledPlotWindow):
+    """专用力传感器组可视化窗口"""
+    def __init__(self, group_id: int):
+        super().__init__(window_index=group_id)
+        self.setWindowTitle(f"Force Sensor Group {group_id+1}")
         self.ax.set_title(f'Force Group {group_id+1} (5 channels)')
         self.ax.set_xlabel('Time Step')
         self.ax.set_ylabel('Force (N)')
-        self.ax.grid(True)
-        
+
         # 数据存储
         self.buffer_size = 200
         self.x_data = np.arange(self.buffer_size)
@@ -104,7 +278,14 @@ class HandMonitor(Node):
         # 启用高分辨率(HiDPI)缩放适配，必须在创建 QApplication 之前设置
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling, True)
         QtWidgets.QApplication.setAttribute(QtCore.Qt.AA_UseHighDpiPixmaps, True)
+        # 支持 125%/150% 等非整数缩放(Qt >= 5.14)，避免向下取整导致界面偏小
+        if hasattr(QtCore.Qt, 'HighDpiScaleFactorRoundingPolicy'):
+            QtWidgets.QApplication.setHighDpiScaleFactorRoundingPolicy(
+                QtCore.Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
         self.app = QtWidgets.QApplication(sys.argv)
+        # 按当前显示器缩放 Qt 字体与 matplotlib 全局字号/DPI
+        self.ui_scale = apply_app_scaling(self.app)
+        self.get_logger().info(f"Display scale factor: {self.ui_scale:.2f}, dpi: {screen_dpi():.0f}")
         
         # 窗口管理
         self.force_windows = {}  # 存储force组窗口 {group_id: window}
@@ -235,22 +416,15 @@ class HandMonitor(Node):
             self.torque_window.close()
         super().destroy_node()
 
-class DataPlotWindow(QtWidgets.QMainWindow):
+class DataPlotWindow(ScaledPlotWindow):
     """通用数据绘图窗口"""
     def __init__(self, title: str, ylabel: str, channel_count: int, y_range: tuple):
         super().__init__()
         self.setWindowTitle(title)
-        self.setGeometry(*scaled_window_geometry())
-        
-        # 图形设置：使用 constrained 布局，为外置图例预留空间，避免被裁剪
-        self.canvas = FigureCanvasQTAgg(Figure(figsize=(8, 4), layout='constrained'))
-        self.setCentralWidget(self.canvas)
-        self.ax = self.canvas.figure.add_subplot(111)
         self.ax.set_title(title)
         self.ax.set_xlabel('Time Step')
         self.ax.set_ylabel(ylabel)
-        self.ax.grid(True)
-        
+
         # 数据存储
         self.buffer_size = 200
         self.x_data = np.arange(self.buffer_size)
