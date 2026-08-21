@@ -1,4 +1,4 @@
-VERSION: 3.2.1 # 支持O6手掌传感器
+VERSION: 3.2.2 # 支持L20V10\L20V11全掌传感器
 LINKER_HAND:  # 手部配置信息
   LEFT_HAND:
     EXISTS: True # 是否存在左手

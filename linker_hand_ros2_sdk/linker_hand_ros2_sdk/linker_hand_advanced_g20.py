@@ -251,7 +251,7 @@ def main(args=None):
     /cb_{self.hand_type}_hand_state 话题类型为 sensor_msgs/msg/JointState 30Hz
     '/cb_{self.hand_type}_hand_matrix_touch' 话题类型为 std_msgs/msg/String 30Hz
     启动命令:
-    ros2 run linker_hand_ros2_sdk linker_hand_advanced_g20 --hand_type right --can can0 --is_touch true
+    ros2 run linker_hand_ros2_sdk linker_hand_advanced_g20 --hand_type left --can can0 --is_touch true
     '''
     try:
         rclpy.init(args=args)

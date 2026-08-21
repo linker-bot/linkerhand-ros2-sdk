@@ -110,7 +110,7 @@ class LinkerHandAdvancedG20(Node):
         self.api.finger_move(pose=DEFAULT_POSITION)
         time.sleep(0.1)
         self.palm_touch = self.api.is_palm_touch
-        if self.palm_touch == 5:
+        if self.palm_touch == 5 or self.palm_touch == 7:
             self.touch_sleep_time = 0.03
             ColorMsg(msg=f"{self.hand_type} {self.hand_joint} 全掌压感版", color="green")
         else:
@@ -168,7 +168,7 @@ class LinkerHandAdvancedG20(Node):
                 self.matrix_dic["ring_matrix"] = self.api.get_ring_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             if self.count == 10:
                 self.matrix_dic["little_matrix"] = self.api.get_little_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
-            if self.count == 14 and self.palm_touch == 5:
+            if self.count == 14 and (self.palm_touch == 5 or self.palm_touch == 7):
                 self.matrix_dic["palm_matrix"] = self.api.get_palm_matrix_touch(sleep_time=self.touch_sleep_time).tolist()
             # 发布矩阵压感数据JSON格式
             self.pub_matrix_dic()

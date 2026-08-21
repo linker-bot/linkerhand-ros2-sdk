@@ -292,7 +292,7 @@ class LinkerHandApi:
                 return self.hand.get_palm_matrix_touch(sleep_time=sleep_time)
             else:
                 return self.hand.get_palm_matrix_touch()
-        if self.is_palm_touch == 5:
+        if self.is_palm_touch == 5 or self.is_palm_touch == 7:
             if sleep_time > 0:
                 return self.hand.get_palm_matrix_touch(sleep_time=sleep_time)
             else:
