@@ -3,7 +3,6 @@ python-can-candle
 minimalmodbus
 pymodbus==3.5.1
 pyserial
-dm_env
 pexpect
 pyquaternion
 pyagxrobots
@@ -16,6 +15,5 @@ wandb
 mediapipe
 pyqt5
 pyqtgraph
-dm_control
 uvicorn
 tabulate
