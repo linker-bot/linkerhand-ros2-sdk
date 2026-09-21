@@ -8,11 +8,6 @@ import sys
 
 import numpy as np
 
-# 必须在 import pyqtgraph 之前设置：强制 pyqtgraph 与本文件使用同一个 Qt 绑定(PyQt5)。
-# 否则在同时安装了 PyQt5/PyQt6 的环境中，pyqtgraph 会自动挑选另一个绑定，
-# 其控件(如 GraphicsLayoutWidget)与本文件的 PyQt5 布局互不认识，
-# 会在 layout.addWidget(wave_widget) 处抛出:
-#   TypeError: addWidget(...): argument 1 has unexpected type 'GraphicsLayoutWidget'
 os.environ.setdefault('PYQTGRAPH_QT_LIB', 'PyQt5')
 import pyqtgraph as pg
 import rclpy
